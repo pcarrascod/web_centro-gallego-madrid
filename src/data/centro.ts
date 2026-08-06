@@ -4,15 +4,23 @@
  * cámbialo en este archivo y se actualiza en todas las páginas a la vez.
  */
 
+import { grupos } from "./grupos";
+
+const FUNDACION = 1892;
+
+/** Se cuentan solos a partir de grupos.ts, para que no se queden desfasados. */
+const numeroDeGrupos = String(grupos.length);
+const anios = String(new Date().getFullYear() - FUNDACION);
+
 export const centro = {
   nombre: "Centro Gallego",
   nombreCompleto: "Centro Gallego de Madrid",
   subtitulo: "de Madrid · 1892",
-  fundacion: 1892,
+  fundacion: FUNDACION,
   temporada: "Temporada 2026 · 2027",
 
   direccion: {
-    calle: "Calle Carretas 14, 2º",
+    calle: "Calle Carretas 14, 3ª planta",
     cp: "28012",
     ciudad: "Madrid",
     comoLlegar: "A dos minutos de Sol.",
@@ -20,25 +28,25 @@ export const centro = {
 
   secretaria: {
     horario: "Martes y jueves, 18.00 – 20.30",
-    email: "secretaria@centrogallegomadrid.es",
-    telefono: "91 000 00 00",
+    email: "info@centrogallegodemadrid.es",
+    telefono: "91 070 42 29",
   },
 
-  cuotaMensual: "12 €",
+  cuotaMensual: "15 €",
 
   /** Las cifras del hero de Inicio. */
   destacados: [
-    { valor: "7", etiqueta: "grupos" },
-    { valor: "340", etiqueta: "socios" },
-    { valor: "134", etiqueta: "años" },
+    { valor: numeroDeGrupos, etiqueta: "grupos" },
+    { valor: "???", etiqueta: "socios" },
+    { valor: anios, etiqueta: "años" },
   ],
 
   /** La franja de cifras de la página Nosotros. */
   cifras: [
-    { valor: "340", etiqueta: "Socios" },
-    { valor: "7", etiqueta: "Grupos" },
-    { valor: "18", etiqueta: "Actuaciones al año" },
-    { valor: "12 €", etiqueta: "Cuota mensual" },
+    { valor: "???", etiqueta: "Socios" },
+    { valor: numeroDeGrupos, etiqueta: "Grupos" },
+    { valor: "??", etiqueta: "Actuaciones al año" },
+    { valor: "15 €", etiqueta: "Cuota mensual" },
   ],
 } as const;
 

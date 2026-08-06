@@ -6,7 +6,7 @@ import { historia } from "@/data/historia";
 export const metadata: Metadata = {
   title: "Nosotros",
   description:
-    "El Centro Gallego de Madrid nació en 1892 como lugar de encuentro para los gallegos que llegaban a la capital. Siete grupos ensayan cada semana en la sede de la calle Carretas.",
+    "El Centro Gallego de Madrid nació en 1892 como lugar de encuentro para los gallegos que llegaban a la capital. Seis grupos ensayan cada semana en la sede de la calle Carretas.",
 };
 
 export default function Nosotros() {
@@ -40,9 +40,9 @@ export default function Nosotros() {
             <p className="eyebrow">Qué hacemos</p>
             <h2>Enseñar, ensayar, actuar</h2>
             <p style={{ marginTop: 20 }}>
-              Siete grupos ensayan cada semana en la sede: baile tradicional en dos
-              niveles, canto y pandereta en tres, banda de gaitas y coro. Los grupos de
-              repertorio actúan fuera — romerías, festivales y las fiestas gallegas de
+              Seis grupos ensayan cada semana en la sede: baile tradicional en dos
+              niveles, pandereta en tres, banda de gaitas, cantos de taberna y coro. Los grupos
+              actúan fuera — romerías, festivales y las fiestas gallegas de
               Madrid.
             </p>
             <p>
@@ -90,8 +90,8 @@ export default function Nosotros() {
             <p className="eyebrow">La sede</p>
             <h2>{centro.direccion.calle}</h2>
             <p style={{ marginTop: 20 }}>
-              {centro.direccion.comoLlegar} Salón de ensayo con suelo de madera, sala de
-              música, archivo de trajes y bar de socios.
+              {centro.direccion.comoLlegar} Salón de ensayo, sala de
+              música, biblioteca, archivo de trajes y bar.
             </p>
             <p className="small">
               <strong style={{ color: "var(--lousa)" }}>Secretaría</strong>

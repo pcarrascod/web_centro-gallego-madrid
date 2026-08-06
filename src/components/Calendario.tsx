@@ -66,10 +66,19 @@ export function Calendario({
 
       /* Después los ensayos semanales, si su filtro está activo. */
       for (const g of grupos) {
-        if (g.diaSemana !== diaSemana) continue;
+        /* Un grupo puede ensayar un día o varios: 6 o [1, 6]. */
+        const dias = Array.isArray(g.diaSemana) ? g.diaSemana : [g.diaSemana];
+        if (!dias.includes(diaSemana)) continue;
         if (!activas[g.categoria]) continue;
+
+        /* La hora puede ser una sola o una por día: "19.30" o {1:"19.30", 6:"11.30"}. */
+        const hora =
+          typeof g.horaEnsayo === "string" ? g.horaEnsayo : g.horaEnsayo[diaSemana];
+        /* Si falta la hora de ese día concreto, mejor no pintar nada que mentir. */
+        if (!hora) continue;
+
         marcas.push({
-          texto: `${g.nombreCorto} ${g.horaEnsayo}`,
+          texto: `${g.nombreCorto} ${hora}`,
           clase: categorias[g.categoria].clase,
           destacado: false,
           detalle: g.quien,

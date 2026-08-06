@@ -16,13 +16,12 @@ export default function Actividades() {
         <div className="wrap">
           <p className="eyebrow">Actividades</p>
           <h1 style={{ fontSize: "clamp(2.4rem,5vw,3.6rem)" }}>
-            Siete grupos,
+            Seis grupos,
             <br />
             una sede
           </h1>
           <p className="lead" style={{ margin: "20px 0 44px" }}>
-            Pide plaza en el grupo que quieras. La secretaría confirma en 48 horas y te
-            dice qué ropa necesitas.
+            Pide plaza en el grupo que quieras
           </p>
 
           <div className="acts">
@@ -35,8 +34,8 @@ export default function Actividades() {
 
       <Cta
         eyebrow="¿Dudas?"
-        titulo="Ven un sábado y míralo"
-        texto="Los ensayos de baile están abiertos a quien quiera asistir. Pregunta por Marisa en la puerta."
+        titulo="Ven a un ensayo y pruébalo"
+        texto="Los ensayos están abiertos a todo el mundo. Ven a vernos y a probar, sin compromiso."
         boton="Ver horarios"
         href="/calendario"
       />

@@ -11,14 +11,20 @@
  */
 
 /**
- * Las cuatro familias de actividad, con su color en el calendario.
+ * Las familias de actividad, con su color en el calendario.
  * `etiqueta` se usa en la leyenda; `corta`, en los botones de filtro.
+ *
+ * Para añadir una categoría nueva: pon aquí la línea con su `clase`, y
+ * define el color de esa clase en globals.css, junto a las demás `.c-*`.
+ * El botón de filtro y la entrada de la leyenda aparecen solos.
  */
 export const categorias = {
   baile: { etiqueta: "Baile tradicional", corta: "Baile", clase: "c-baile" },
   pand: { etiqueta: "Canto y pandereta", corta: "Pandereta", clase: "c-pand" },
   banda: { etiqueta: "Banda de gaitas", corta: "Banda", clase: "c-banda" },
   coro: { etiqueta: "Coro", corta: "Coro", clase: "c-coro" },
+  perc: { etiqueta: "Percusión", corta: "Percusión", clase: "c-perc" },
+  taberna: { etiqueta: "Cantos de taberna", corta: "Taberna", clase: "c-taberna" },
 } as const;
 
 export type Categoria = keyof typeof categorias;
@@ -43,19 +49,28 @@ export type Grupo = {
   quien: string;
   /** Día de ensayo, para el título de la tarjeta. */
   dia: string;
-  /** 1 = lunes, 2 = martes ... 6 = sábado, 0 = domingo. Lo usa el calendario. */
-  diaSemana: number;
-  /** Hora con la que aparece el ensayo en el calendario: "10.30" */
-  horaEnsayo: string;
+  /**
+   * 1 = lunes, 2 = martes ... 6 = sábado, 0 = domingo. Lo usa el calendario.
+   * Si el grupo ensaya varios días, ponlos en una lista: `[1, 6]`.
+   */
+  diaSemana: number | number[];
+  /**
+   * Hora con la que aparece el ensayo en el calendario: "10.30".
+   * Si el grupo ensaya a horas distintas según el día, pon una por día,
+   * con el mismo número de día que en `diaSemana`:
+   *
+   *     diaSemana: [1, 6],
+   *     horaEnsayo: { 1: "19.30", 6: "11.30" },
+   */
+  horaEnsayo: string | Record<number, string>;
   /** Texto del marcador mientras no haya foto real. */
   foto: string;
   horarios: Horario[];
-  /** Aviso que se lee junto al botón cuando NO hay solicitud. */
+  /**
+   * Aviso que se lee junto al botón de solicitar, en la tarjeta y en el
+   * formulario: "Empieza el 14 de septiembre", "Instrumento propio"...
+   */
   estado: string;
-  /** Aviso que se lee cuando sí la hay. */
-  estadoSolicitado: string;
-  /** Deja true para mostrar la plaza como ya solicitada. */
-  solicitado: boolean;
 };
 
 export const grupos: Grupo[] = [
@@ -64,57 +79,52 @@ export const grupos: Grupo[] = [
     categoria: "baile",
     nombre: "Baile tradicional",
     nombreCorto: "Baile",
-    quien: "Adultos e infantil · Salón grande",
+    quien: "Adultos · Salón grande",
     dia: "Sábado",
     diaSemana: 6,
     horaEnsayo: "10.30",
     foto: "Foto · Baile tradicional",
     horarios: [
       { hora: "10.30 – 11.30", nivel: "Repertorio", plazas: "Con audición" },
-      { hora: "11.30 – 12.30", nivel: "Técnica", plazas: "3 plazas" },
-      { hora: "11.30 – 12.30", nivel: "Infantil (6–12)", plazas: "Completo" },
+      { hora: "11.30 – 12.30", nivel: "Técnica", plazas: "Plazas disponibles" },
       { hora: "12.30 – 13.00", nivel: "Ensayo con banda", plazas: "Repertorio" },
     ],
-    estado: "Empieza el 7 de septiembre",
-    estadoSolicitado: "Pendiente de confirmar por secretaría",
-    solicitado: true,
+    estado: "Empieza el 19 de septiembre",
   },
   {
     id: "canto-pandereta",
     categoria: "pand",
-    nombre: "Canto y pandereta",
+    nombre: "Panderereteiras",
     nombreCorto: "Pandereta",
-    quien: "Adultos · Sala de música",
+    quien: "Adultos · Salón o Sala Airiños",
     dia: "Lunes",
     diaSemana: 1,
     horaEnsayo: "18.00",
     foto: "Foto · Canto y pandereta",
     horarios: [
-      { hora: "18.00 – 19.00", nivel: "Iniciación", plazas: "6 plazas" },
-      { hora: "19.00 – 20.00", nivel: "Perfeccionamiento", plazas: "2 plazas" },
-      { hora: "20.00 – 21.00", nivel: "Avanzado", plazas: "Con audición" },
+      { hora: "18.30 – 19.30", nivel: "Iniciación", plazas: "Plazas disponibles" },
+      { hora: "19.30 – 20.30", nivel: "Intermedio", plazas: "Plazas disponibles" },
+      { hora: "20.30 – 21.00", nivel: "Oficial", plazas: "Con audición" },
     ],
-    estado: "Empieza el 7 de septiembre",
-    estadoSolicitado: "Pendiente de confirmar por secretaría",
-    solicitado: false,
+    estado: "Empieza el 14 de septiembre",
   },
   {
     id: "banda-gaitas",
     categoria: "banda",
     nombre: "Banda de gaitas",
     nombreCorto: "Banda",
-    quien: "Gaita, percusión y bombo · Salón grande",
-    dia: "Miércoles",
-    diaSemana: 3,
-    horaEnsayo: "19.00",
+    quien: "Gaita, percusión y bombo · Salón grande o Biblioteca",
+    dia: "Sábado",
+    diaSemana: 6,
+    horaEnsayo: "10.30",
     foto: "Foto · Banda de gaitas",
     horarios: [
-      { hora: "19.00 – 20.00", nivel: "Gaita, iniciación", plazas: "4 plazas" },
-      { hora: "20.00 – 21.30", nivel: "Banda completa", plazas: "Con audición" },
+      { hora: "10.30 – 12.00", nivel: "Ensayo con flautas", plazas: "Plazas disponibles" },
+      { hora: "12.30 – 13.00", nivel: "Banda completa con baile", plazas: "Con audición" },
+      { hora: "13.00 – 14.00", nivel: "Banda completa", plazas: "Con audición" },
+      { hora: "14.00 – 14.30", nivel: "Banda completa con Cantos de taberna", plazas: "Plazas disponibles" },
     ],
-    estado: "Instrumento propio o cedido por el centro",
-    estadoSolicitado: "Pendiente de confirmar por secretaría",
-    solicitado: false,
+    estado: "Instrumento propio",
   },
   {
     id: "coro",
@@ -124,11 +134,40 @@ export const grupos: Grupo[] = [
     quien: "Voces mixtas · Sala de música",
     dia: "Jueves",
     diaSemana: 4,
-    horaEnsayo: "19.30",
+    horaEnsayo: "19.00",
     foto: "Foto · Coro",
-    horarios: [{ hora: "19.30 – 21.00", nivel: "Ensayo general", plazas: "Abierto" }],
+    horarios: [{ hora: "19.00 – 21.00", nivel: "Ensayo general", plazas: "Plazas disponibles" }],
     estado: "No hace falta saber solfeo",
-    estadoSolicitado: "Pendiente de confirmar por secretaría",
-    solicitado: false,
+  },
+  {
+    id: "percusion",
+    categoria: "perc",
+    nombre: "Percusión",
+    nombreCorto: "Percusión",
+    quien: "Percusión · Sala Airiños",
+    dia: "Lunes, Sábado",
+    diaSemana: [1, 6],
+    horaEnsayo: { 1: "19.30", 6: "11.30" },
+    foto: "Foto · Percusión",
+    horarios: [
+      { hora: "19.30 – 20.30", nivel: "[Lunes] Percusión iniciación", plazas: "Plazas disponibles" },
+      { hora: "11.30 – 12.30", nivel: "[Sábado] Percusión intermedio", plazas: "Plazas disponibles" }
+    ],
+    estado: "No hace falta saber percusión",
+  },
+  {
+    id: "cantosTaberna",
+    categoria: "taberna",
+    nombre: "Cantos de taberna",
+    nombreCorto: "Taberna",
+    quien: "Todos · Sala Airiños",
+    dia: "Sábado",
+    diaSemana: 6,
+    horaEnsayo: "13.30",
+    foto: "Foto · Cantos de taberna",
+    horarios: [
+      { hora: "13.30 – 14.30", nivel: "Cantos de taberna", plazas: "Plazas disponibles" }
+    ],
+    estado: "No hace falta saber cantar",
   },
 ];

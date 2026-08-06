@@ -1,0 +1,28 @@
+<!--
+  Este archivo existe solo para que Netlify sepa que el formulario existe.
+
+  Netlify detecta los formularios leyendo el HTML al compilar, y el nuestro se
+  monta con React, así que no lo vería. Aquí van los mismos campos, escondidos.
+
+  IMPORTANTE: si añades o quitas un campo en FormularioSolicitud.tsx, añádelo o
+  quítalo también aquí, con el mismo `name`. Si no, Netlify descartará ese dato
+  sin avisar.
+-->
+<html lang="es">
+  <head>
+    <title>Formularios</title>
+  </head>
+  <body>
+    <form name="solicitud-plaza" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="solicitud-plaza" />
+      <input type="text" name="bot-field" />
+      <input type="text" name="nombre" />
+      <input type="tel" name="telefono" />
+      <input type="email" name="email" />
+      <input type="text" name="grupo" />
+      <input type="text" name="horario" />
+      <input type="text" name="socio" />
+      <textarea name="mensaje"></textarea>
+    </form>
+  </body>
+</html>

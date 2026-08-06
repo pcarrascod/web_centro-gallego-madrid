@@ -26,7 +26,7 @@ export default function Inicio() {
               <em>Madrid</em>
             </h1>
             <p className="lead" style={{ marginTop: 22 }}>
-              Baile, pandereta, gaita y voz. Cada semana, en la calle Carretas, desde{" "}
+              Coro, baile, pandereta, gaita, percusión y cantos de taberna. Cada semana, en la calle Carretas, desde{" "}
               {centro.fundacion}.
             </p>
             <div className="hero-acciones">
@@ -47,7 +47,7 @@ export default function Inicio() {
             </div>
           </div>
           <Foto
-            texto="Foto · Grupo de baile en la Plaza de la Villa"
+            texto="Foto · a Determinar"
             className="hero-photo"
           />
         </div>
@@ -106,10 +106,10 @@ export default function Inicio() {
 
       <Cta
         eyebrow="Hazte socio"
-        titulo="No hace falta ser gallego. Ni saber bailar."
+        titulo="No hace falta ser gallego. Ni saber cantar, bailar o tocar."
         texto={`Los grupos de iniciación empiezan de cero cada septiembre. La cuota de socio es de ${centro.cuotaMensual} al mes e incluye todas las clases.`}
         boton="Solicitar plaza"
-        href="/actividades"
+        href="/solicitar"
       />
     </div>
   );

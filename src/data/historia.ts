@@ -29,7 +29,7 @@ export const historia: Hito[] = [
   },
   {
     anio: "2026",
-    titulo: "Escuela infantil",
-    texto: "Se abre el grupo de baile infantil, de 6 a 12 años.",
+    titulo: "Recuperación de la banda",
+    texto: "Se crea el grupo folclórico del Centro Gallego",
   },
 ];

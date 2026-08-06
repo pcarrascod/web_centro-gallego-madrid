@@ -181,6 +181,42 @@ p{margin:0 0 1rem}
 .join[aria-pressed="true"]::before{content:"✓ "}
 .state{font-size:.84rem;color:var(--neboa)}
 
+/* ---------- Formularios ---------- */
+.form{max-width:620px}
+.oculto{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.campo{margin-bottom:22px}
+.campo label{
+  display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--neboa);margin-bottom:8px;
+}
+.campo input,.campo select,.campo textarea{
+  width:100%;font:inherit;font-size:1rem;color:var(--lousa);background:var(--branco);
+  border:1px solid var(--linea);border-radius:2px;padding:12px 14px;
+  transition:border-color .18s, box-shadow .18s;
+}
+.campo input:focus,.campo select:focus,.campo textarea:focus{
+  outline:none;border-color:var(--azul);box-shadow:0 0 0 3px var(--azul-claro);
+}
+.campo textarea{min-height:110px;resize:vertical}
+.campo .ayuda{font-size:.84rem;color:var(--neboa);margin:8px 0 0}
+
+.consent{
+  display:flex;gap:12px;align-items:flex-start;margin:30px 0;
+  font-size:.9rem;line-height:1.55;color:var(--neboa);cursor:pointer;
+}
+.consent input{flex:none;width:17px;height:17px;margin-top:3px;accent-color:var(--azul)}
+
+.form-error{
+  border-left:3px solid var(--carmin);background:#FDF2F4;padding:14px 18px;
+  font-size:.92rem;margin-bottom:24px;
+}
+.form-error a{color:var(--carmin);border-bottom:1px solid currentColor}
+
+.gracias{
+  max-width:620px;border:1px solid var(--linea);border-left:3px solid #0E7A4A;
+  background:var(--branco);padding:38px 36px 34px;
+}
+
 /* ---------- Nosotros ---------- */
 .two{display:grid;grid-template-columns:1fr 1fr;gap:58px;align-items:start}
 .pull{
@@ -215,6 +251,8 @@ p{margin:0 0 1rem}
 .c-pand{background:#3FA7D6}
 .c-banda{background:var(--carmin)}
 .c-coro{background:#8A7BD8}
+.c-perc{background:#C08A2E}
+.c-taberna{background:#2E7D5B}
 .c-evento{background:var(--azul)}
 
 .grid-cal{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--linea);border-top:1px solid var(--linea)}
@@ -243,6 +281,8 @@ p{margin:0 0 1rem}
 .cta::after{
   content:"";position:absolute;inset:0;
   background:linear-gradient(28deg,transparent 0 62%, rgba(255,255,255,.08) 62% 78%, transparent 78%);
+  /* Es solo decoración: sin esto tapa el botón y se come los clics. */
+  pointer-events:none;
 }
 .cta .wrap{position:relative;padding:78px 28px;text-align:center}
 .cta h2{max-width:20ch;margin:0 auto 18px}
@@ -251,12 +291,11 @@ p{margin:0 0 1rem}
 .cta .btn{background:#fff;color:var(--azul)}
 .cta .btn:hover{background:var(--granito)}
 
-footer{background:var(--lousa);color:#fff;padding:56px 0 40px}
-footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px}
-footer h4{font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:#9095AC;margin:0 0 14px;font-weight:400}
-footer a{display:block;font-size:.92rem;color:rgba(255,255,255,.82);padding:4px 0}
-footer a:hover{color:#fff}
-footer .fine{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255,255,.15);
+footer{background:var(--lousa);color:#fff;padding:44px 0 30px}
+/* Marca a la izquierda y dirección a la derecha, alineadas por arriba. */
+footer .footer-top{display:flex;justify-content:space-between;align-items:flex-start;gap:30px;flex-wrap:wrap}
+footer .footer-dir{margin:0;text-align:right;color:rgba(255,255,255,.7);max-width:34ch}
+footer .fine{margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,.15);
   font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:#8A8FA6;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 /* ---------- Responsive ---------- */
@@ -267,7 +306,6 @@ footer .fine{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255,
   .dates{grid-template-columns:1fr}
   .acts{grid-template-columns:1fr}
   .stats{grid-template-columns:repeat(2,1fr)}
-  footer .cols{grid-template-columns:1fr 1fr}
 }
 @media (max-width:760px){
   .nav{
@@ -285,7 +323,8 @@ footer .fine{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255,
   .cell{min-height:auto;border:1px solid var(--linea);margin-bottom:-1px}
   .cell.empty{display:none}
   .stats{grid-template-columns:1fr 1fr}
-  footer .cols{grid-template-columns:1fr}
+  /* En móvil la dirección cae debajo de la marca: alineada a la izquierda. */
+  footer .footer-dir{text-align:left}
   .month{min-width:auto;font-size:1.35rem}
 }
 @media (prefers-reduced-motion:reduce){

@@ -1,19 +1,13 @@
-"use client";
-
-import { useState } from "react";
+import Link from "next/link";
 import type { Grupo } from "@/data/grupos";
 import { Foto } from "./Foto";
 
 /**
  * Una tarjeta de la página Actividades.
  *
- * Aviso: el botón «Solicitar plaza» hoy solo cambia de aspecto — no envía
- * nada a secretaría. Para que la solicitud llegue de verdad hace falta
- * añadir un formulario o una base de datos (ver README).
+ * El botón lleva al formulario de solicitud con el grupo ya seleccionado.
  */
 export function TarjetaActividad({ grupo }: { grupo: Grupo }) {
-  const [solicitado, setSolicitado] = useState(grupo.solicitado);
-
   return (
     <article className="act">
       <Foto texto={grupo.foto} />
@@ -33,16 +27,10 @@ export function TarjetaActividad({ grupo }: { grupo: Grupo }) {
         </ul>
 
         <div className="act-foot">
-          <button
-            className="btn sm join"
-            aria-pressed={solicitado}
-            onClick={() => setSolicitado((v) => !v)}
-          >
-            {solicitado ? "Solicitado" : "Solicitar plaza"}
-          </button>
-          <span className="state">
-            {solicitado ? grupo.estadoSolicitado : grupo.estado}
-          </span>
+          <Link className="btn sm" href={`/solicitar?grupo=${grupo.id}`}>
+            Solicitar plaza
+          </Link>
+          <span className="state">{grupo.estado}</span>
         </div>
       </div>
     </article>
