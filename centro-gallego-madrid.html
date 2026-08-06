@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Centro Gallego de Madrid — Maqueta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Paleta */
+  --azul:#1515D4;          /* banda de la bandera gallega */
+  --azul-claro:#EDEDFF;
+  --azul-hover:#0F0FA8;
+  --lousa:#14162B;         /* pizarra */
+  --granito:#EDEBE8;       /* granito */
+  --branco:#FBFBFD;
+  --neboa:#6B7086;         /* niebla: texto secundario */
+  --carmin:#C4122F;        /* cruz de Santiago */
+  --linea:#DEDCE2;
+
+  --display:"Bodoni Moda", Georgia, "Times New Roman", serif;
+  --sans:"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  --nav-h:74px;
+  --max:1180px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--branco);color:var(--lousa);
+  font-family:var(--sans);font-size:16px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:2.5px solid var(--azul);outline-offset:3px;border-radius:2px}
+
+.wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
+
+/* ---------- Tipografía ---------- */
+.eyebrow{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--azul);margin:0 0 14px;display:flex;align-items:center;gap:10px;
+}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--carmin);flex:none}
+h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;letter-spacing:-.015em;line-height:1.05}
+h1{font-size:clamp(2.9rem,7vw,5.4rem);line-height:.95}
+h2{font-size:clamp(1.9rem,3.6vw,2.7rem)}
+h3{font-size:1.35rem;line-height:1.2}
+p{margin:0 0 1rem}
+.lead{font-size:1.12rem;color:var(--neboa);max-width:54ch}
+.small{font-size:.9rem;color:var(--neboa)}
+
+/* ---------- Cabecera ---------- */
+.header{
+  position:sticky;top:0;z-index:60;background:rgba(251,251,253,.92);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--linea);
+}
+.header-in{max-width:var(--max);margin:0 auto;padding:0 28px;height:var(--nav-h);
+  display:flex;align-items:center;gap:26px}
+.brand{display:flex;align-items:center;gap:12px;margin-right:auto}
+.brand-name{font-family:var(--display);font-size:1.16rem;line-height:1.05;letter-spacing:-.01em}
+.brand-sub{font-family:var(--mono);font-size:.6rem;letter-spacing:.19em;text-transform:uppercase;color:var(--neboa)}
+.cruz{width:26px;height:34px;flex:none}
+
+.nav{display:flex;gap:4px}
+.nav button{
+  font-size:.94rem;padding:9px 14px;border-radius:999px;color:var(--lousa);
+  transition:background .18s, color .18s;position:relative;
+}
+.nav button:hover{background:var(--azul-claro);color:var(--azul)}
+.nav button[aria-current="page"]{color:var(--azul);font-weight:600}
+.nav button[aria-current="page"]::after{
+  content:"";position:absolute;left:14px;right:14px;bottom:2px;height:2px;background:var(--azul);
+}
+.tools{display:flex;align-items:center;gap:12px}
+.lang{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;border:1px solid var(--linea);
+  border-radius:999px;padding:7px 12px;background:var(--branco);color:var(--lousa);
+}
+.avatar-wrap{position:relative}
+.avatar{
+  width:38px;height:38px;border-radius:50%;border:1px solid var(--linea);overflow:hidden;
+  background:linear-gradient(170deg,#CDE3F5 0 52%, #8FA96B 52% 100%);display:block;
+}
+.menu{
+  position:absolute;right:0;top:calc(100% + 12px);width:200px;background:var(--branco);
+  border:1px solid var(--linea);border-radius:12px;padding:6px;
+  box-shadow:0 18px 40px -18px rgba(20,22,43,.35);display:none;
+}
+.menu.open{display:block}
+.menu a{display:block;padding:9px 12px;border-radius:8px;font-size:.9rem}
+.menu a:hover{background:var(--azul-claro);color:var(--azul)}
+.menu hr{border:0;border-top:1px solid var(--linea);margin:6px 4px}
+.menu .out{color:var(--carmin)}
+
+.burger{display:none}
+
+/* ---------- Vistas ---------- */
+.view{display:none}
+.view.active{display:block;animation:fade .4s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- Hero (Inicio) ---------- */
+.hero{position:relative;overflow:hidden;background:var(--granito)}
+.hero-band{
+  position:absolute;inset:0;
+  background:linear-gradient(28deg,transparent 0 34%, var(--azul) 34% 58%, transparent 58%);
+  opacity:1;
+}
+.hero-in{position:relative;max-width:var(--max);margin:0 auto;padding:88px 28px 78px;
+  display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:center}
+.hero h1{mix-blend-mode:normal}
+.hero h1 em{font-style:italic;color:var(--azul)}
+.hero-card{
+  background:var(--branco);padding:38px 36px 34px;border-radius:2px;
+  box-shadow:0 30px 60px -30px rgba(20,22,43,.4);
+}
+.hero-meta{display:flex;gap:26px;flex-wrap:wrap;margin-top:26px;padding-top:22px;border-top:1px solid var(--linea)}
+.hero-meta div{font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;color:var(--neboa)}
+.hero-meta strong{display:block;font-family:var(--display);font-size:1.5rem;color:var(--lousa);font-weight:500;letter-spacing:0}
+.hero-photo{
+  aspect-ratio:4/5;background:var(--lousa);position:relative;overflow:hidden;
+  clip-path:polygon(0 8%,100% 0,100% 92%,0 100%);
+}
+
+/* Marcadores de foto */
+.ph{background:#DCD9D6;position:relative;overflow:hidden;display:grid;place-items:center}
+.ph::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(28deg,transparent 0 40%, rgba(21,21,212,.13) 40% 62%, transparent 62%);
+}
+.ph span{
+  position:relative;font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;
+  text-transform:uppercase;color:#7C7873;text-align:center;padding:0 16px;
+}
+
+/* ---------- Secciones ---------- */
+.section{padding:84px 0}
+.section.tint{background:var(--granito)}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:38px;flex-wrap:wrap}
+.link{
+  font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--azul);border-bottom:1px solid currentColor;padding-bottom:3px;
+}
+.link:hover{color:var(--carmin)}
+
+.btn{
+  display:inline-flex;align-items:center;gap:9px;background:var(--azul);color:#fff;
+  padding:13px 26px;border-radius:999px;font-size:.94rem;font-weight:500;
+  transition:background .18s, transform .18s;
+}
+.btn:hover{background:var(--azul-hover);transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:var(--azul);box-shadow:inset 0 0 0 1.5px var(--azul)}
+.btn.ghost:hover{background:var(--azul);color:#fff}
+.btn.sm{padding:9px 18px;font-size:.86rem}
+
+/* Próximas citas */
+.dates{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--linea);border:1px solid var(--linea)}
+.date{background:var(--branco);padding:30px 26px;transition:background .2s}
+.date:hover{background:var(--azul-claro)}
+.date .day{font-family:var(--display);font-size:3.2rem;line-height:.9;letter-spacing:-.03em}
+.date .mon{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--azul);margin-bottom:18px}
+.date h3{margin:14px 0 6px}
+.date .small{margin:0}
+
+/* Actividades: rejilla de tarjetas */
+.acts{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
+.act{border:1px solid var(--linea);background:var(--branco);display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .22s, transform .22s}
+.act:hover{box-shadow:0 24px 48px -28px rgba(20,22,43,.45);transform:translateY(-3px)}
+.act .ph{height:190px}
+.act-body{padding:26px 26px 24px;display:flex;flex-direction:column;flex:1}
+.act h3{margin-bottom:4px}
+.act .who{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--neboa);margin-bottom:18px}
+.sched{list-style:none;margin:0 0 22px;padding:0;border-top:1px solid var(--linea)}
+.sched li{display:flex;gap:16px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--linea)}
+.sched time{font-family:var(--mono);font-size:.82rem;color:var(--azul);flex:none;min-width:108px}
+.sched .lvl{font-size:.94rem}
+.sched .free{margin-left:auto;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--neboa)}
+.day-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--lousa);padding:14px 0 4px;display:block}
+.act-foot{margin-top:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.join[aria-pressed="true"]{background:#0E7A4A}
+.join[aria-pressed="true"]::before{content:"✓ "}
+.state{font-size:.84rem;color:var(--neboa)}
+
+/* ---------- Nosotros ---------- */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:58px;align-items:start}
+.pull{
+  font-family:var(--display);font-size:clamp(1.5rem,2.6vw,2.05rem);line-height:1.25;
+  border-left:3px solid var(--azul);padding-left:26px;margin:34px 0;
+}
+.timeline{list-style:none;margin:0;padding:0}
+.timeline li{display:grid;grid-template-columns:96px 1fr;gap:24px;padding:22px 0;border-top:1px solid var(--linea)}
+.timeline li:last-child{border-bottom:1px solid var(--linea)}
+.timeline .yr{font-family:var(--mono);font-size:.86rem;color:var(--azul);letter-spacing:.06em;padding-top:4px}
+.timeline h3{font-size:1.1rem;margin-bottom:4px}
+.timeline p{margin:0;font-size:.94rem;color:var(--neboa)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--linea);border:1px solid var(--linea);margin-top:52px}
+.stat{background:var(--granito);padding:28px 22px}
+.stat strong{display:block;font-family:var(--display);font-size:2.6rem;line-height:1;letter-spacing:-.03em}
+.stat span{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--neboa)}
+
+/* ---------- Calendario ---------- */
+.cal-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+.arrow{width:38px;height:38px;border:1px solid var(--linea);border-radius:50%;display:grid;place-items:center;transition:.18s}
+.arrow:hover{border-color:var(--azul);color:var(--azul)}
+.month{font-family:var(--display);font-size:1.7rem;min-width:230px}
+.filters{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--linea);border-radius:999px;padding:7px 13px;display:flex;align-items:center;gap:7px;transition:.18s;
+}
+.chip:hover{border-color:var(--azul)}
+.chip[aria-pressed="true"]{background:var(--lousa);color:#fff;border-color:var(--lousa)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.c-baile{background:var(--azul)}
+.c-pand{background:#3FA7D6}
+.c-banda{background:var(--carmin)}
+.c-coro{background:#8A7BD8}
+
+.grid-cal{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--linea);border-top:1px solid var(--linea)}
+.grid-cal .dow{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--neboa);
+  padding:11px 12px;border-right:1px solid var(--linea);border-bottom:1px solid var(--linea);background:var(--granito);
+}
+.cell{min-height:118px;padding:9px 10px;border-right:1px solid var(--linea);border-bottom:1px solid var(--linea);background:var(--branco)}
+.cell.empty{background:#F6F5F7}
+.cell .n{font-family:var(--mono);font-size:.78rem;color:var(--neboa);display:block;margin-bottom:7px}
+.cell.today .n{background:var(--azul);color:#fff;border-radius:50%;width:23px;height:23px;display:grid;place-items:center;font-weight:500}
+.ev{
+  display:flex;gap:6px;align-items:flex-start;font-size:.74rem;line-height:1.3;padding:3px 5px;margin-bottom:3px;
+  border-radius:3px;background:#F4F4FA;cursor:pointer;
+}
+.ev:hover{background:var(--azul-claro)}
+.ev .dot{margin-top:5px}
+.ev.big{background:var(--azul);color:#fff;font-weight:500}
+.ev.big .dot{background:#fff}
+.ev.big:hover{background:var(--azul-hover)}
+.legend{margin-top:18px;display:flex;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--neboa)}
+.legend span{display:flex;align-items:center;gap:7px}
+
+/* ---------- CTA + pie ---------- */
+.cta{background:var(--azul);color:#fff;position:relative;overflow:hidden}
+.cta::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(28deg,transparent 0 62%, rgba(255,255,255,.08) 62% 78%, transparent 78%);
+}
+.cta .wrap{position:relative;padding:78px 28px;text-align:center}
+.cta h2{max-width:20ch;margin:0 auto 18px}
+.cta p{color:rgba(255,255,255,.82);max-width:52ch;margin:0 auto 30px}
+.cta .btn{background:#fff;color:var(--azul)}
+.cta .btn:hover{background:var(--granito)}
+
+footer{background:var(--lousa);color:#fff;padding:56px 0 40px}
+footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px}
+footer h4{font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:#9095AC;margin:0 0 14px;font-weight:400}
+footer a{display:block;font-size:.92rem;color:rgba(255,255,255,.82);padding:4px 0}
+footer a:hover{color:#fff}
+footer .fine{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255,255,.15);
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:#8A8FA6;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1000px){
+  .hero-in{grid-template-columns:1fr;padding:64px 28px}
+  .hero-photo{order:-1;aspect-ratio:16/10;clip-path:polygon(0 4%,100% 0,100% 96%,0 100%)}
+  .two{grid-template-columns:1fr;gap:36px}
+  .dates{grid-template-columns:1fr}
+  .acts{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  footer .cols{grid-template-columns:1fr 1fr}
+}
+@media (max-width:760px){
+  .nav{
+    position:fixed;inset:var(--nav-h) 0 auto;background:var(--branco);flex-direction:column;
+    padding:14px;border-bottom:1px solid var(--linea);display:none;
+  }
+  .nav.open{display:flex}
+  .nav button{text-align:left;border-radius:8px}
+  .nav button[aria-current="page"]::after{display:none}
+  .burger{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--linea);border-radius:10px}
+  .lang{display:none}
+  .section{padding:58px 0}
+  .grid-cal{grid-template-columns:1fr;border:0}
+  .grid-cal .dow{display:none}
+  .cell{min-height:auto;border:1px solid var(--linea);margin-bottom:-1px}
+  .cell.empty{display:none}
+  .stats{grid-template-columns:1fr 1fr}
+  footer .cols{grid-template-columns:1fr}
+  .month{min-width:auto;font-size:1.35rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ CABECERA ══════════ -->
+<header class="header">
+  <div class="header-in">
+    <a class="brand" href="#" onclick="go('inicio');return false">
+      <svg class="cruz" viewBox="0 0 26 34" aria-hidden="true">
+        <path d="M13 34c-1.2-4-2.2-6.2-2.2-9.4 0-1.6.6-3 1.4-4.2h-8c-1.4 0-2.6-1-2.6-2.4S2.8 15.6 4.2 15.6h6.6c-.6-1-1-2-1-3.2 0-1 .3-2 .8-2.9H4.2c-1.4 0-2.6-1-2.6-2.4s1.2-2.4 2.6-2.4h8.2C13 3 13.4 1.6 13 0c-.4 1.6 0 3 .6 4.7h8.2c1.4 0 2.6 1 2.6 2.4s-1.2 2.4-2.6 2.4h-6.4c.5.9.8 1.9.8 2.9 0 1.2-.4 2.2-1 3.2h6.6c1.4 0 2.6 1 2.6 2.4s-1.2 2.4-2.6 2.4h-8c.8 1.2 1.4 2.6 1.4 4.2 0 3.2-1 5.4-2.2 9.4Z" fill="#C4122F"/>
+      </svg>
+      <span>
+        <span class="brand-name">Centro Gallego</span><br>
+        <span class="brand-sub">de Madrid · 1892</span>
+      </span>
+    </a>
+
+    <nav class="nav" id="nav">
+      <button onclick="go('inicio')" data-v="inicio" aria-current="page">Inicio</button>
+      <button onclick="go('nosotros')" data-v="nosotros">Nosotros</button>
+      <button onclick="go('calendario')" data-v="calendario">Calendario</button>
+      <button onclick="go('actividades')" data-v="actividades">Actividades</button>
+    </nav>
+
+    <div class="tools">
+      <select class="lang" aria-label="Idioma">
+        <option>Castellano</option>
+        <option>Galego</option>
+      </select>
+      <div class="avatar-wrap">
+        <button class="avatar" id="avatarBtn" aria-haspopup="true" aria-expanded="false" aria-label="Mi cuenta"></button>
+        <div class="menu" id="userMenu">
+          <a href="#">Configuración</a>
+          <a href="#">Mi ropa</a>
+          <a href="#">Clases</a>
+          <a href="#">Ropa</a>
+          <a href="#">Eventos</a>
+          <hr>
+          <a href="#" class="out">Cerrar sesión</a>
+        </div>
+      </div>
+      <button class="burger" id="burger" aria-label="Menú" aria-expanded="false">
+        <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M0 1h18M0 6h18M0 11h18" stroke="currentColor" stroke-width="1.6"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ══════════ INICIO ══════════ -->
+<section class="view active" id="v-inicio">
+
+  <div class="hero">
+    <div class="hero-band" aria-hidden="true"></div>
+    <div class="hero-in">
+      <div class="hero-card">
+        <p class="eyebrow">Temporada 2026 · 2027</p>
+        <h1>Galicia<br>suena en<br><em>Madrid</em></h1>
+        <p class="lead" style="margin-top:22px">Baile, pandereta, gaita y voz. Cada semana, en la calle Carretas, desde 1892.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:26px">
+          <a class="btn" href="#" onclick="go('actividades');return false">Ver actividades</a>
+          <a class="btn ghost" href="#" onclick="go('calendario');return false">Calendario</a>
+        </div>
+        <div class="hero-meta">
+          <div><strong>7</strong>grupos</div>
+          <div><strong>340</strong>socios</div>
+          <div><strong>134</strong>años</div>
+        </div>
+      </div>
+      <div class="hero-photo ph"><span>Foto · Grupo de baile en la Plaza de la Villa</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Próximas citas</p>
+          <h2>Lo que viene</h2>
+        </div>
+        <a class="link" href="#" onclick="go('calendario');return false">Todo el calendario</a>
+      </div>
+      <div class="dates">
+        <article class="date">
+          <p class="mon">Septiembre</p>
+          <p class="day">05</p>
+          <h3>Puertas abiertas</h3>
+          <p class="small">Sede de Carretas · 11.00 – 14.00<br>Prueba una clase de cada grupo. Sin inscripción.</p>
+        </article>
+        <article class="date">
+          <p class="mon">Septiembre</p>
+          <p class="day">20</p>
+          <h3>Feira Galega</h3>
+          <p class="small">Matadero Madrid · 18.30<br>Actúan baile repertorio y banda.</p>
+        </article>
+        <article class="date">
+          <p class="mon">Noviembre</p>
+          <p class="day">08</p>
+          <h3>Magosto</h3>
+          <p class="small">Sede de Carretas · 19.00<br>Castañas, ruada y queimada. Abierto a socios.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="section tint">
+    <div class="wrap two">
+      <div>
+        <p class="eyebrow">Nosotros</p>
+        <h2>Una casa gallega en el centro de Madrid</h2>
+        <p class="lead" style="margin-top:20px">Somos una asociación cultural sin ánimo de lucro. Enseñamos y mantenemos vivo el baile, la música y la lengua de Galicia para quien vive lejos de ella — y para quien nunca ha estado.</p>
+        <p><a class="link" href="#" onclick="go('nosotros');return false">Conoce el centro</a></p>
+      </div>
+      <div class="ph" style="aspect-ratio:5/4"><span>Foto · Sede, salón de ensayos</span></div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <div class="wrap">
+      <p class="eyebrow" style="color:#fff;justify-content:center">Hazte socio</p>
+      <h2>No hace falta ser gallego. Ni saber bailar.</h2>
+      <p>Los grupos de iniciación empiezan de cero cada septiembre. La cuota de socio es de 12 € al mes e incluye todas las clases.</p>
+      <a class="btn" href="#" onclick="go('actividades');return false">Solicitar plaza</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ NOSOTROS ══════════ -->
+<section class="view" id="v-nosotros">
+  <div class="section">
+    <div class="wrap">
+      <p class="eyebrow">Nosotros</p>
+      <h1 style="max-width:16ch">Llevamos Galicia<br>a la calle Carretas</h1>
+      <p class="lead" style="margin-top:26px;font-size:1.2rem">El Centro Gallego de Madrid nació en 1892 como lugar de encuentro para los gallegos que llegaban a la capital. Hoy sigue haciendo lo mismo: enseñar, ensayar y salir a la calle.</p>
+    </div>
+  </div>
+
+  <div class="wrap"><div class="ph" style="aspect-ratio:21/9"><span>Foto histórica · Socios fundadores, c. 1900</span></div></div>
+
+  <div class="section">
+    <div class="wrap two">
+      <div>
+        <p class="eyebrow">Qué hacemos</p>
+        <h2>Enseñar, ensayar, actuar</h2>
+        <p style="margin-top:20px">Siete grupos ensayan cada semana en la sede: baile tradicional en dos niveles, canto y pandereta en tres, banda de gaitas y coro. Los grupos de repertorio actúan fuera — romerías, festivales y las fiestas gallegas de Madrid.</p>
+        <p>El centro también organiza clases de gallego, la biblioteca de tradición oral y las cenas de socios que dan sentido a todo lo demás.</p>
+        <div class="pull">«Aquí se aprende un pasodoble y se acaba aprendiendo de dónde viene una familia entera.»</div>
+        <p class="small">Manuela Riveiro, socia desde 1978</p>
+      </div>
+      <div>
+        <p class="eyebrow">Historia</p>
+        <ul class="timeline">
+          <li><span class="yr">1892</span><div><h3>Fundación</h3><p>Un grupo de emigrantes gallegos abre la primera sede en la calle del Príncipe.</p></div></li>
+          <li><span class="yr">1949</span><div><h3>Primer grupo de baile</h3><p>Nace la sección de folclore, hoy el corazón del centro.</p></div></li>
+          <li><span class="yr">1981</span><div><h3>Sede de Carretas</h3><p>El centro se traslada a su sede actual, con salón de ensayos propio.</p></div></li>
+          <li><span class="yr">2007</span><div><h3>Banda de gaitas</h3><p>Se forma la banda, que acompaña al baile en las actuaciones.</p></div></li>
+          <li><span class="yr">2026</span><div><h3>Escuela infantil</h3><p>Se abre el grupo de baile infantil, de 6 a 12 años.</p></div></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="stats">
+        <div class="stat"><strong>340</strong><span>Socios</span></div>
+        <div class="stat"><strong>7</strong><span>Grupos</span></div>
+        <div class="stat"><strong>18</strong><span>Actuaciones al año</span></div>
+        <div class="stat"><strong>12 €</strong><span>Cuota mensual</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section tint">
+    <div class="wrap two">
+      <div>
+        <p class="eyebrow">La sede</p>
+        <h2>Calle Carretas 14, 2º</h2>
+        <p style="margin-top:20px">A dos minutos de Sol. Salón de ensayo con suelo de madera, sala de música, archivo de trajes y bar de socios.</p>
+        <p class="small"><strong style="color:var(--lousa)">Secretaría</strong><br>Martes y jueves, 18.00 – 20.30<br>secretaria@centrogallegomadrid.es · 91 000 00 00</p>
+        <p style="margin-top:24px"><a class="btn ghost" href="#">Cómo llegar</a></p>
+      </div>
+      <div class="ph" style="aspect-ratio:4/3"><span>Mapa · Calle Carretas 14</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CALENDARIO ══════════ -->
+<section class="view" id="v-calendario">
+  <div class="section">
+    <div class="wrap">
+      <p class="eyebrow">Calendario</p>
+      <h1 style="font-size:clamp(2.4rem,5vw,3.6rem)">Ensayos y actuaciones</h1>
+      <p class="lead" style="margin:20px 0 44px">Todo lo del centro en un sitio. Filtra por grupo para ver solo lo tuyo.</p>
+
+      <div class="cal-bar">
+        <button class="arrow" aria-label="Mes anterior">‹</button>
+        <button class="arrow" aria-label="Mes siguiente">›</button>
+        <div class="month">Septiembre 2026</div>
+        <div class="filters">
+          <button class="chip" aria-pressed="true"><i class="dot c-baile"></i>Baile</button>
+          <button class="chip" aria-pressed="true"><i class="dot c-pand"></i>Pandereta</button>
+          <button class="chip" aria-pressed="true"><i class="dot c-banda"></i>Banda</button>
+          <button class="chip" aria-pressed="true"><i class="dot c-coro"></i>Coro</button>
+        </div>
+      </div>
+
+      <div class="grid-cal" id="cal"></div>
+
+      <div class="legend">
+        <span><i class="dot c-baile"></i>Baile tradicional</span>
+        <span><i class="dot c-pand"></i>Canto y pandereta</span>
+        <span><i class="dot c-banda"></i>Banda de gaitas</span>
+        <span><i class="dot c-coro"></i>Coro</span>
+        <span><i class="dot" style="background:var(--azul)"></i>Actuación o evento</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ACTIVIDADES ══════════ -->
+<section class="view" id="v-actividades">
+  <div class="section">
+    <div class="wrap">
+      <p class="eyebrow">Actividades</p>
+      <h1 style="font-size:clamp(2.4rem,5vw,3.6rem)">Siete grupos,<br>una sede</h1>
+      <p class="lead" style="margin:20px 0 44px">Pide plaza en el grupo que quieras. La secretaría confirma en 48 horas y te dice qué ropa necesitas.</p>
+
+      <div class="acts">
+
+        <article class="act">
+          <div class="ph"><span>Foto · Baile tradicional</span></div>
+          <div class="act-body">
+            <h3>Baile tradicional</h3>
+            <p class="who">Adultos e infantil · Salón grande</p>
+            <span class="day-label">Sábado</span>
+            <ul class="sched">
+              <li><time>10.30 – 11.30</time><span class="lvl">Repertorio</span><span class="free">Con audición</span></li>
+              <li><time>11.30 – 12.30</time><span class="lvl">Técnica</span><span class="free">3 plazas</span></li>
+              <li><time>11.30 – 12.30</time><span class="lvl">Infantil (6–12)</span><span class="free">Completo</span></li>
+              <li><time>12.30 – 13.00</time><span class="lvl">Ensayo con banda</span><span class="free">Repertorio</span></li>
+            </ul>
+            <div class="act-foot">
+              <button class="btn sm join" aria-pressed="true">Solicitado</button>
+              <span class="state">Pendiente de confirmar por secretaría</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="act">
+          <div class="ph"><span>Foto · Canto y pandereta</span></div>
+          <div class="act-body">
+            <h3>Canto y pandereta</h3>
+            <p class="who">Adultos · Sala de música</p>
+            <span class="day-label">Lunes</span>
+            <ul class="sched">
+              <li><time>18.00 – 19.00</time><span class="lvl">Iniciación</span><span class="free">6 plazas</span></li>
+              <li><time>19.00 – 20.00</time><span class="lvl">Perfeccionamiento</span><span class="free">2 plazas</span></li>
+              <li><time>20.00 – 21.00</time><span class="lvl">Avanzado</span><span class="free">Con audición</span></li>
+            </ul>
+            <div class="act-foot">
+              <button class="btn sm join" aria-pressed="false">Solicitar plaza</button>
+              <span class="state">Empieza el 7 de septiembre</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="act">
+          <div class="ph"><span>Foto · Banda de gaitas</span></div>
+          <div class="act-body">
+            <h3>Banda de gaitas</h3>
+            <p class="who">Gaita, percusión y bombo · Salón grande</p>
+            <span class="day-label">Miércoles</span>
+            <ul class="sched">
+              <li><time>19.00 – 20.00</time><span class="lvl">Gaita, iniciación</span><span class="free">4 plazas</span></li>
+              <li><time>20.00 – 21.30</time><span class="lvl">Banda completa</span><span class="free">Con audición</span></li>
+            </ul>
+            <div class="act-foot">
+              <button class="btn sm join" aria-pressed="false">Solicitar plaza</button>
+              <span class="state">Instrumento propio o cedido por el centro</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="act">
+          <div class="ph"><span>Foto · Coro</span></div>
+          <div class="act-body">
+            <h3>Coro</h3>
+            <p class="who">Voces mixtas · Sala de música</p>
+            <span class="day-label">Jueves</span>
+            <ul class="sched">
+              <li><time>19.30 – 21.00</time><span class="lvl">Ensayo general</span><span class="free">Abierto</span></li>
+            </ul>
+            <div class="act-foot">
+              <button class="btn sm join" aria-pressed="false">Solicitar plaza</button>
+              <span class="state">No hace falta saber solfeo</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <div class="wrap">
+      <p class="eyebrow" style="color:#fff;justify-content:center">¿Dudas?</p>
+      <h2>Ven un sábado y míralo</h2>
+      <p>Los ensayos de baile están abiertos a quien quiera asistir. Pregunta por Marisa en la puerta.</p>
+      <a class="btn" href="#" onclick="go('calendario');return false">Ver horarios</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="brand" style="margin-bottom:14px">
+          <svg class="cruz" viewBox="0 0 26 34" aria-hidden="true"><path d="M13 34c-1.2-4-2.2-6.2-2.2-9.4 0-1.6.6-3 1.4-4.2h-8c-1.4 0-2.6-1-2.6-2.4S2.8 15.6 4.2 15.6h6.6c-.6-1-1-2-1-3.2 0-1 .3-2 .8-2.9H4.2c-1.4 0-2.6-1-2.6-2.4s1.2-2.4 2.6-2.4h8.2C13 3 13.4 1.6 13 0c-.4 1.6 0 3 .6 4.7h8.2c1.4 0 2.6 1 2.6 2.4s-1.2 2.4-2.6 2.4h-6.4c.5.9.8 1.9.8 2.9 0 1.2-.4 2.2-1 3.2h6.6c1.4 0 2.6 1 2.6 2.4s-1.2 2.4-2.6 2.4h-8c.8 1.2 1.4 2.6 1.4 4.2 0 3.2-1 5.4-2.2 9.4Z" fill="#fff"/></svg>
+          <span><span class="brand-name">Centro Gallego</span><br><span class="brand-sub" style="color:#9095AC">de Madrid · 1892</span></span>
+        </div>
+        <p class="small" style="color:rgba(255,255,255,.7);max-width:34ch">Calle Carretas 14, 2º · 28012 Madrid<br>Secretaría: martes y jueves, 18.00 – 20.30</p>
+      </div>
+      <div>
+        <h4>Navegar</h4>
+        <a href="#" onclick="go('inicio');return false">Inicio</a>
+        <a href="#" onclick="go('nosotros');return false">Nosotros</a>
+        <a href="#" onclick="go('calendario');return false">Calendario</a>
+        <a href="#" onclick="go('actividades');return false">Actividades</a>
+      </div>
+      <div>
+        <h4>Socios</h4>
+        <a href="#">Mi ropa</a>
+        <a href="#">Clases y recursos</a>
+        <a href="#">Eventos</a>
+        <a href="#">Configuración</a>
+      </div>
+    </div>
+    <div class="fine">
+      <span>© 2026 Centro Gallego de Madrid</span>
+      <span>Aviso legal · Privacidad · Contacto</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---- Navegación entre pantallas ---- */
+function go(v){
+  document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
+  document.getElementById('v-'+v).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>{
+    if(b.dataset.v===v) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
+  });
+  document.getElementById('nav').classList.remove('open');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+/* ---- Menú de usuario ---- */
+const avatarBtn=document.getElementById('avatarBtn'), userMenu=document.getElementById('userMenu');
+avatarBtn.addEventListener('click',e=>{
+  e.stopPropagation();
+  const open=userMenu.classList.toggle('open');
+  avatarBtn.setAttribute('aria-expanded',open);
+});
+document.addEventListener('click',()=>{userMenu.classList.remove('open');avatarBtn.setAttribute('aria-expanded','false')});
+
+/* ---- Menú móvil ---- */
+const burger=document.getElementById('burger');
+burger.addEventListener('click',()=>{
+  const open=document.getElementById('nav').classList.toggle('open');
+  burger.setAttribute('aria-expanded',open);
+});
+
+/* ---- Botones de solicitud ---- */
+document.querySelectorAll('.join').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const on=b.getAttribute('aria-pressed')==='true';
+    b.setAttribute('aria-pressed',String(!on));
+    b.textContent=on?'Solicitar plaza':'Solicitado';
+    const state=b.parentElement.querySelector('.state');
+    if(state) state.textContent=on?'Empieza el 7 de septiembre':'Pendiente de confirmar por secretaría';
+  });
+});
+
+/* ---- Filtros del calendario ---- */
+document.querySelectorAll('.chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    c.setAttribute('aria-pressed',c.getAttribute('aria-pressed')==='true'?'false':'true');
+    paintCal();
+  });
+});
+
+/* ---- Calendario: septiembre 2026 (empieza en martes) ---- */
+const EVENTS={
+  5:[{t:'Puertas abiertas · 11.00',c:'big'}],
+  7:[{t:'Pandereta 18.00',c:'pand'}], 14:[{t:'Pandereta 18.00',c:'pand'}],
+  21:[{t:'Pandereta 18.00',c:'pand'}], 28:[{t:'Pandereta 18.00',c:'pand'}],
+  9:[{t:'Banda 19.00',c:'banda'}], 16:[{t:'Banda 19.00',c:'banda'}],
+  23:[{t:'Banda 19.00',c:'banda'}], 30:[{t:'Banda 19.00',c:'banda'}],
+  3:[{t:'Coro 19.30',c:'coro'}], 10:[{t:'Coro 19.30',c:'coro'}],
+  17:[{t:'Coro 19.30',c:'coro'}], 24:[{t:'Coro 19.30',c:'coro'}],
+  12:[{t:'Baile 10.30',c:'baile'}], 19:[{t:'Baile 10.30',c:'baile'}],
+  26:[{t:'Baile 10.30',c:'baile'},{t:'Ruada en la sede · 20.00',c:'big'}],
+  20:[{t:'Feira Galega · Matadero',c:'big'}]
+};
+EVENTS[5].push({t:'Baile 10.30',c:'baile'});
+
+function paintCal(){
+  const on={};
+  document.querySelectorAll('.chip').forEach(c=>{
+    const k=c.querySelector('.dot').classList[1].replace('c-','');
+    on[k]=c.getAttribute('aria-pressed')==='true';
+  });
+  const cal=document.getElementById('cal');
+  cal.innerHTML='';
+  ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].forEach(d=>{
+    const e=document.createElement('div'); e.className='dow'; e.textContent=d; cal.appendChild(e);
+  });
+  for(let i=0;i<1;i++){const e=document.createElement('div');e.className='cell empty';cal.appendChild(e);}
+  for(let d=1;d<=30;d++){
+    const cell=document.createElement('div');
+    cell.className='cell'+(d===5?' today':'');
+    cell.innerHTML='<span class="n">'+d+'</span>';
+    (EVENTS[d]||[]).forEach(ev=>{
+      if(ev.c!=='big' && !on[ev.c]) return;
+      const el=document.createElement('div');
+      el.className='ev'+(ev.c==='big'?' big':'');
+      el.innerHTML='<i class="dot c-'+(ev.c==='big'?'baile':ev.c)+'"></i><span>'+ev.t+'</span>';
+      cell.appendChild(el);
+    });
+    cal.appendChild(cell);
+  }
+  for(let i=0;i<4;i++){const e=document.createElement('div');e.className='cell empty';cal.appendChild(e);}
+}
+paintCal();
+</script>
+</body>
+</html>

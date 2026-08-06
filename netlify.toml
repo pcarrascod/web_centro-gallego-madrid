@@ -1,0 +1,10 @@
+# Configuración de despliegue en Netlify.
+# El runtime de Next.js lo instala Netlify automáticamente al detectar el
+# proyecto; aquí solo fijamos el comando y la versión de Node.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
