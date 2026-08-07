@@ -107,7 +107,7 @@ export default function Inicio() {
       <Cta
         eyebrow="Hazte socio"
         titulo="No hace falta ser gallego. Ni saber cantar, bailar o tocar."
-        texto={`Los grupos de iniciación empiezan de cero cada septiembre. La cuota de socio es de ${centro.cuotaMensual} al mes e incluye todas las clases.`}
+        texto={`Los grupos de iniciación empiezan de cero cada septiembre. Consulta las condiciones para ser socio.`}
         boton="Solicitar plaza"
         href="/solicitar"
       />

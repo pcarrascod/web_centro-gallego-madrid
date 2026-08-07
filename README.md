@@ -27,7 +27,7 @@ guardas, y se actualiza en todas las páginas donde aparezca.
 
 | Quiero cambiar… | Archivo |
 | --- | --- |
-| Dirección, teléfono, horario de secretaría, cuota, cifras | [`src/data/centro.ts`](src/data/centro.ts) |
+| Dirección, teléfono, horario de secretaría, cifras | [`src/data/centro.ts`](src/data/centro.ts) |
 | Grupos, días, horarios, niveles, plazas libres | [`src/data/grupos.ts`](src/data/grupos.ts) |
 | Actuaciones, romerías, fiestas, puertas abiertas | [`src/data/eventos.ts`](src/data/eventos.ts) |
 | La cronología de la página Nosotros | [`src/data/historia.ts`](src/data/historia.ts) |

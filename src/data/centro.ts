@@ -32,8 +32,6 @@ export const centro = {
     telefono: "91 070 42 29",
   },
 
-  cuotaMensual: "15 €",
-
   /** Las cifras del hero de Inicio. */
   destacados: [
     { valor: numeroDeGrupos, etiqueta: "grupos" },
@@ -46,7 +44,6 @@ export const centro = {
     { valor: "???", etiqueta: "Socios" },
     { valor: numeroDeGrupos, etiqueta: "Grupos" },
     { valor: "??", etiqueta: "Actuaciones al año" },
-    { valor: "15 €", etiqueta: "Cuota mensual" },
   ],
 } as const;
 
