@@ -2,37 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { centro, menuSocio, navegacion } from "@/data/centro";
+import { useState } from "react";
+import { centro, navegacion } from "@/data/centro";
 import { CruzSantiago } from "./CruzSantiago";
 
-export function Header() {
+/**
+ * `cuenta` es el botón de entrar o el avatar con su menú, según haya sesión o
+ * no. Llega ya montado desde el layout porque eso hay que decidirlo en el
+ * servidor, leyendo la cookie, y aquí estamos en el navegador.
+ */
+export function Header({ cuenta }: { cuenta: React.ReactNode }) {
   const ruta = usePathname();
-  const [menuAbierto, setMenuAbierto] = useState(false);
-  const [navAbierta, setNavAbierta] = useState(false);
-  const avatar = useRef<HTMLDivElement>(null);
 
-  /* El menú del avatar se cierra al pulsar fuera o con Escape. */
-  useEffect(() => {
-    if (!menuAbierto) return;
-    const fuera = (e: MouseEvent) => {
-      if (!avatar.current?.contains(e.target as Node)) setMenuAbierto(false);
-    };
-    const escape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuAbierto(false);
-    };
-    document.addEventListener("click", fuera);
-    document.addEventListener("keydown", escape);
-    return () => {
-      document.removeEventListener("click", fuera);
-      document.removeEventListener("keydown", escape);
-    };
-  }, [menuAbierto]);
-
-  /* Al cambiar de página se cierra el menú móvil. */
-  useEffect(() => {
-    setNavAbierta(false);
-  }, [ruta]);
+  /*
+   * El menú móvil tiene que cerrarse al cambiar de página. En vez de guardar
+   * «abierto sí o no» y cerrarlo cuando la ruta cambia, guardamos *en qué
+   * página* se abrió: si la ruta de ahora no es esa, está cerrado. Así se
+   * cierra solo al navegar, sin tener que vigilar nada.
+   */
+  const [abiertaEn, setAbiertaEn] = useState<string | null>(null);
+  const navAbierta = abiertaEn === ruta;
 
   return (
     <header className="header">
@@ -64,35 +53,13 @@ export function Header() {
             <option>Galego</option>
           </select>
 
-          <div className="avatar-wrap" ref={avatar}>
-            <button
-              className="avatar"
-              aria-haspopup="true"
-              aria-expanded={menuAbierto}
-              aria-label="Mi cuenta"
-              onClick={(e) => {
-                e.stopPropagation();
-                setMenuAbierto((v) => !v);
-              }}
-            />
-            <div className={`menu ${menuAbierto ? "open" : ""}`.trim()}>
-              {menuSocio.map((enlace) => (
-                <a key={enlace.texto} href={enlace.href}>
-                  {enlace.texto}
-                </a>
-              ))}
-              <hr />
-              <a href="#" className="out">
-                Cerrar sesión
-              </a>
-            </div>
-          </div>
+          {cuenta}
 
           <button
             className="burger"
             aria-label="Menú"
             aria-expanded={navAbierta}
-            onClick={() => setNavAbierta((v) => !v)}
+            onClick={() => setAbiertaEn(navAbierta ? null : ruta)}
           >
             <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true">
               <path d="M0 1h18M0 6h18M0 11h18" stroke="currentColor" strokeWidth="1.6" />

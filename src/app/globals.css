@@ -157,8 +157,10 @@ p{margin:0 0 1rem}
 .dates{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--linea);border:1px solid var(--linea)}
 .date{background:var(--branco);padding:30px 26px;transition:background .2s}
 .date:hover{background:var(--azul-claro)}
-.date .day{font-family:var(--display);font-size:3.2rem;line-height:.9;letter-spacing:-.03em}
-.date .mon{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--azul);margin-bottom:18px}
+/* Las tarjetas de «Próximos eventos» del panel usan el mismo día en grande, así
+   que comparten estas dos reglas en vez de repetir los valores. */
+.date .day,.eventos .day{font-family:var(--display);font-size:3.2rem;line-height:.9;letter-spacing:-.03em}
+.date .mon,.eventos .mon{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--azul);margin-bottom:18px}
 .date h3{margin:14px 0 6px}
 .date .small{margin:0}
 
@@ -189,12 +191,16 @@ p{margin:0 0 1rem}
   display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;
   text-transform:uppercase;color:var(--neboa);margin-bottom:8px;
 }
-.campo input,.campo select,.campo textarea{
+/* Los campos del panel —filas de horarios, selector de rol— se pintan igual
+   que los del formulario de solicitud, para no tener dos estilos de input. */
+.campo input,.campo select,.campo textarea,
+.fila input,.fila select,.rol-form select{
   width:100%;font:inherit;font-size:1rem;color:var(--lousa);background:var(--branco);
   border:1px solid var(--linea);border-radius:2px;padding:12px 14px;
   transition:border-color .18s, box-shadow .18s;
 }
-.campo input:focus,.campo select:focus,.campo textarea:focus{
+.campo input:focus,.campo select:focus,.campo textarea:focus,
+.fila input:focus,.fila select:focus,.rol-form select:focus{
   outline:none;border-color:var(--azul);box-shadow:0 0 0 3px var(--azul-claro);
 }
 .campo textarea{min-height:110px;resize:vertical}
@@ -211,6 +217,11 @@ p{margin:0 0 1rem}
   font-size:.92rem;margin-bottom:24px;
 }
 .form-error a{color:var(--carmin);border-bottom:1px solid currentColor}
+
+.form-ok{
+  border-left:3px solid #0E7A4A;background:#F1F8F4;padding:14px 18px;
+  font-size:.92rem;margin-bottom:24px;
+}
 
 .gracias{
   max-width:620px;border:1px solid var(--linea);border-left:3px solid #0E7A4A;
@@ -298,6 +309,195 @@ footer .footer-dir{margin:0;text-align:right;color:rgba(255,255,255,.7);max-widt
 footer .fine{margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,.15);
   font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:#8A8FA6;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
+/* ---------- Zona privada ---------- */
+/* Todo lo de /entrar y /panel. Reutiliza lo que ya había —.btn, .sched,
+   .campo, .eyebrow— y solo añade lo que no existía. */
+
+.wrap-estrecho{max-width:760px}
+
+/* El avatar con iniciales sustituye al dibujo de antes. `.avatar-hueco` es lo
+   que se ve el instante en que todavía no se ha leído la cookie. */
+.avatar-letras{
+  background:var(--lousa);color:#fff;display:grid;place-items:center;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.03em;
+}
+.avatar-hueco{background:var(--granito)}
+
+.menu-quien{margin:0;padding:9px 12px 4px;line-height:1.3}
+.menu-quien strong{display:block;font-size:.92rem}
+.menu-quien span{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--neboa);
+}
+/* «Cerrar sesión» es un botón dentro de un formulario, no un enlace: tiene que
+   ser un botón para poder cerrar la sesión en el servidor. */
+.menu form{margin:0}
+.menu button.out{
+  display:block;width:100%;text-align:left;padding:9px 12px;border-radius:8px;
+  font:inherit;font-size:.9rem;color:var(--carmin);background:none;border:0;cursor:pointer;
+}
+.menu button.out:hover{background:#FDF2F4}
+
+/* Las cuentas de prueba de la pantalla de entrar. */
+.pruebas{max-width:620px;margin-top:44px;padding-top:30px;border-top:1px solid var(--linea)}
+.pruebas-botones{display:flex;gap:10px;flex-wrap:wrap}
+.pruebas code{font-family:var(--mono);font-size:.86rem;background:var(--granito);padding:2px 6px}
+
+/* La franja de identidad y navegación del panel. */
+.panel-cab{
+  display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+  padding-bottom:22px;border-bottom:1px solid var(--linea);
+}
+.panel-quien{display:flex;align-items:center;gap:14px}
+.panel-nombre{display:block;font-size:1rem;margin-bottom:5px}
+.panel-nav{display:flex;gap:4px}
+.panel-nav a{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:9px 14px;border-radius:999px;color:var(--neboa);
+}
+.panel-nav a:hover{background:var(--azul-claro);color:var(--azul)}
+.panel-nav a[aria-current="page"]{background:var(--lousa);color:#fff}
+
+/* Etiqueta del rol. La suave es para matices: «tú», «solo en tus grupos». */
+.pill{
+  display:inline-block;font-family:var(--mono);font-size:.62rem;letter-spacing:.13em;
+  text-transform:uppercase;background:var(--azul-claro);color:var(--azul);
+  padding:4px 9px;border-radius:999px;
+}
+.pill-suave{background:var(--granito);color:var(--neboa);margin-left:9px}
+
+.panel-bloque{margin-bottom:64px}
+.panel-h2{
+  font-size:1.4rem;margin-bottom:8px;padding-bottom:14px;
+  border-bottom:1px solid var(--linea);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+}
+.cuenta{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--neboa);
+}
+.panel-bloque code,.aviso code{font-family:var(--mono);font-size:.86rem;background:var(--granito);padding:2px 6px}
+
+/* Tarjetas de grupo dentro del panel: más sobrias que las de Actividades,
+   porque aquí no hay que convencer a nadie de que se apunte. */
+.fichas{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:26px}
+.ficha{border:1px solid var(--linea);background:var(--branco);padding:24px 24px 22px;display:flex;flex-direction:column}
+.ficha-cab{margin-bottom:14px}
+.ficha-cab h3{margin-bottom:2px}
+.ficha .sched{margin-bottom:18px}
+
+/* Tablas. `.tabla-scroll` deja que la tabla se desplace sola en móvil, en vez
+   de desbordar la página entera. */
+.tabla-scroll{overflow-x:auto;margin-top:26px}
+.tabla{width:100%;border-collapse:collapse;font-size:.94rem}
+.tabla th,.tabla td{text-align:left;padding:13px 16px 13px 0;border-bottom:1px solid var(--linea);vertical-align:middle}
+.tabla thead th{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--neboa);font-weight:400;border-bottom:1px solid var(--lousa);white-space:nowrap;
+}
+.tabla tbody th{font-weight:500;white-space:nowrap}
+.tabla a{color:var(--azul)}
+.tabla a:hover{border-bottom:1px solid currentColor}
+.nowrap{white-space:nowrap;font-family:var(--mono);font-size:.88rem}
+.apagado{color:var(--neboa)}
+
+.tabla-permisos td{font-size:.9rem}
+.tabla-permisos .si{color:#0E7A4A;font-weight:500}
+.tabla-permisos .parcial{color:var(--azul)}
+
+.rol-form{display:flex;gap:8px;align-items:center}
+.rol-form select{width:auto;padding:9px 12px;font-size:.9rem}
+
+.roles-leyenda{margin:30px 0 0;display:grid;gap:14px}
+.roles-leyenda dt{font-weight:600;font-size:.95rem}
+.roles-leyenda dd{margin:2px 0 0;font-size:.92rem;color:var(--neboa);max-width:70ch}
+
+/* El cartel de «esto no es para ti». */
+.aviso{border:1px solid var(--linea);border-left:3px solid var(--carmin);background:var(--branco);padding:30px 30px 26px}
+.aviso .panel-h2{border:0;padding:0;margin-bottom:12px}
+
+/* Los enlaces del menú van a secciones de esta misma página. La cabecera está
+   fija arriba, así que sin este margen el título quedaría tapado por ella. */
+.panel-bloque[id]{scroll-margin-top:calc(var(--nav-h) + 26px)}
+
+.panel-h3{
+  margin:0 0 6px;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--lousa);
+}
+
+/* ---------- Mi ropa ---------- */
+/* Lo que presta el centro: una línea por prenda, con el estado a la vista. */
+.prendas{list-style:none;margin:0;padding:0;border-top:1px solid var(--linea);max-width:700px}
+.prendas li{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding:12px 0;border-bottom:1px solid var(--linea);
+}
+.prenda-nombre{font-size:.98rem;min-width:150px}
+.prenda-talla{font-family:var(--mono);font-size:.8rem;color:var(--azul)}
+.prenda-estado{
+  margin-left:auto;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--neboa);
+}
+/* Solo se pinta en rojo lo que hay que arreglar o cambiar: si todo estuviera
+   marcado, no se vería lo que necesita atención. */
+.prenda-estado.avisa{color:var(--carmin)}
+.prenda-nota{flex-basis:100%;font-size:.86rem;color:var(--neboa)}
+
+.medidas{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;max-width:700px}
+.medidas .campo{margin-bottom:0}
+
+/* ---------- Próximos eventos ---------- */
+/* En fila, una tarjeta al lado de otra. `auto-fill` se encarga de cuántas caben:
+   cuatro en un portátil, dos en una tableta, una en el móvil — sin tener que
+   escribir un tamaño de pantalla para cada caso. */
+.eventos{
+  list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:20px;
+}
+.eventos li{
+  border:1px solid var(--linea);background:var(--branco);padding:22px 22px 20px;
+  display:flex;flex-direction:column;
+}
+.eventos .mon{margin-bottom:10px}
+.eventos .day{margin:0 0 14px}
+.eventos li h3{font-size:1.02rem;margin:0 0 8px}
+.eventos li .small{margin:0 0 4px}
+/* `margin-top:auto` lo empuja abajo, así queda a la misma altura en todas las
+   tarjetas aunque unas tengan descripción y otras no. */
+.evento-falta{
+  margin:auto 0 0;padding-top:14px;
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--azul);
+}
+
+/* La tabla editable de horarios. */
+.form-ancho{max-width:840px}
+.filas{margin-bottom:20px}
+.filas-cab,.fila{display:grid;grid-template-columns:1fr 1fr 1fr 38px;gap:10px;align-items:center}
+.filas-cab{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--neboa);margin-bottom:8px;
+}
+.fila{margin-bottom:10px}
+.fila input,.fila select{font-size:.94rem;padding:11px 12px}
+.quitar{
+  width:38px;height:38px;border:1px solid var(--linea);border-radius:2px;background:var(--branco);
+  color:var(--neboa);font-size:1.1rem;line-height:1;cursor:pointer;transition:.18s;
+}
+.quitar:hover{border-color:var(--carmin);color:var(--carmin)}
+
+/* Alta y ficha de una persona: los campos de dos en dos, y las casillas de
+   los grupos en rejilla. */
+.campos-dos{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+.casillas{border:0;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px 22px}
+.casillas legend{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--neboa);margin-bottom:12px;padding:0;
+}
+.casilla{display:flex;gap:10px;align-items:center;font-size:.95rem;cursor:pointer}
+.casilla input{flex:none;width:17px;height:17px;accent-color:var(--azul)}
+.tabla tr.de-baja td{color:var(--neboa)}
+
 /* ---------- Responsive ---------- */
 @media (max-width:1000px){
   .hero-in{grid-template-columns:1fr;padding:64px 28px}
@@ -305,6 +505,7 @@ footer .fine{margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,
   .two{grid-template-columns:1fr;gap:36px}
   .dates{grid-template-columns:1fr}
   .acts{grid-template-columns:1fr}
+  .fichas{grid-template-columns:1fr}
 }
 @media (max-width:760px){
   .nav{
@@ -325,6 +526,14 @@ footer .fine{margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,
   /* En móvil la dirección cae debajo de la marca: alineada a la izquierda. */
   footer .footer-dir{text-align:left}
   .month{min-width:auto;font-size:1.35rem}
+  /* Las tablas editables se apilan: cuatro columnas no caben en un móvil. La
+     primera casilla —la hora, o la prenda— ocupa el ancho entero. */
+  .filas-cab{display:none}
+  .fila{grid-template-columns:1fr 38px;gap:8px;margin-bottom:22px}
+  .fila > :first-child{grid-column:1/-1}
+  .medidas{grid-template-columns:repeat(2,1fr)}
+  .campos-dos{grid-template-columns:1fr}
+  .panel-cab{align-items:flex-start}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}

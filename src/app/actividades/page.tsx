@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Cta } from "@/components/Cta";
 import { TarjetaActividad } from "@/components/TarjetaActividad";
-import { grupos } from "@/data/grupos";
+import { todosLosGrupos } from "@/lib/acceso";
 
 export const metadata: Metadata = {
   title: "Actividades",
@@ -9,7 +9,14 @@ export const metadata: Metadata = {
     "Baile tradicional, canto y pandereta, banda de gaitas y coro. Horarios, niveles y plazas disponibles en el Centro Gallego de Madrid.",
 };
 
-export default function Actividades() {
+/*
+ * Los grupos se piden a `lib/acceso` y no a `data/grupos` para que aquí se
+ * vean los horarios que un profesor haya cambiado desde el panel. Es
+ * información pública: no hay que haber entrado para verla.
+ */
+export default async function Actividades() {
+  const grupos = await todosLosGrupos();
+
   return (
     <div className="page">
       <div className="section">

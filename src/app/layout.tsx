@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Bodoni_Moda, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Suspense } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { MenuCuenta } from "@/components/MenuCuenta";
 import { centro } from "@/data/centro";
 import "./globals.css";
 
@@ -45,7 +47,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
       <body>
-        <Header />
+        {/*
+         * El menú de cuenta va dentro de un `Suspense` porque para saber qué
+         * poner ahí hay que leer la cookie de sesión. Sin él, toda la página
+         * esperaría a esa lectura antes de empezar a aparecer; con él, la web
+         * se pinta y ese hueco se rellena en cuanto se sepa.
+         */}
+        <Header
+          cuenta={
+            <Suspense fallback={<span className="avatar avatar-hueco" />}>
+              <MenuCuenta />
+            </Suspense>
+          }
+        />
         <main>{children}</main>
         <Footer />
       </body>

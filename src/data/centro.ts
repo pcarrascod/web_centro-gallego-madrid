@@ -55,10 +55,8 @@ export const navegacion = [
   { href: "/actividades", texto: "Actividades" },
 ] as const;
 
-/** Enlaces del menú del avatar (zona de socios, todavía sin funcionalidad). */
-export const menuSocio = [
-  { href: "#", texto: "Configuración" },
-  { href: "#", texto: "Mi ropa" },
-  { href: "#", texto: "Clases" },
-  { href: "#", texto: "Eventos" },
-] as const;
+/*
+ * El menú del avatar ya no se escribe aquí: se arma en `MenuCuenta.tsx` a
+ * partir del rol de quien haya entrado, para no ofrecer enlaces que esa
+ * persona no puede abrir.
+ */
