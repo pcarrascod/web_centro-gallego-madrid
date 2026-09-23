@@ -137,6 +137,29 @@ export async function invitar(
 }
 
 /**
+ * Cambiar el correo con el que entra alguien. Lo hace secretaría, así que se
+ * da por bueno sin mandar un correo de confirmación a la dirección nueva: si
+ * se ha escrito mal, se corrige otra vez desde la ficha.
+ *
+ * Devuelve un mensaje de error, o `null` si ha ido bien.
+ */
+export async function cambiarCorreoDeCuenta(
+  authId: string,
+  email: string,
+): Promise<string | null> {
+  const { error } = await clienteAdmin().auth.admin.updateUserById(authId, {
+    email: email.trim().toLowerCase(),
+    email_confirm: true,
+  });
+  if (!error) return null;
+
+  if (error.code === "email_exists") {
+    return "Ya hay otra cuenta con ese correo.";
+  }
+  return `No se ha podido cambiar el correo: ${error.message}`;
+}
+
+/**
  * En qué punto está la cuenta de alguien:
  *
  *   "pendiente" — se le invitó, pero todavía no ha elegido contraseña.

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FormularioGrupo } from "@/components/FormularioGrupo";
+import { BotonQuitar, FormularioAlumno } from "@/components/FormulariosUsuario";
 import { PanelCabecera } from "@/components/PanelCabecera";
 import {
   alumnosDeGrupo,
@@ -42,6 +43,7 @@ export default async function GrupoDelPanel({ params }: Props) {
 
   const verAlumnos = puedeEnGrupo(usuario, "ver:alumnos", id);
   const editar = puedeEnGrupo(usuario, "editar:grupo", id);
+  const matricular = puedeEnGrupo(usuario, "matricular:alumnos", id);
 
   /* Solo se piden los alumnos si se pueden ver. `alumnosDeGrupo` lo vuelve a
      comprobar por su cuenta, así que tampoco valdría saltarse este `if`. */
@@ -105,7 +107,8 @@ export default async function GrupoDelPanel({ params }: Props) {
               {alumnos.length === 0 ? (
                 <p className="small">
                   Nadie apuntado a este grupo todavía. Las solicitudes de plaza
-                  llegan al correo de secretaría.
+                  llegan al correo de secretaría
+                  {matricular && ", y también puedes apuntar tú a alguien aquí abajo"}.
                 </p>
               ) : (
                 <>
@@ -116,16 +119,37 @@ export default async function GrupoDelPanel({ params }: Props) {
                           <th>Nombre</th>
                           <th>Correo</th>
                           <th>Teléfono</th>
+                          {matricular && <th />}
                         </tr>
                       </thead>
                       <tbody>
                         {alumnos.map((alumno) => (
                           <tr key={alumno.id}>
-                            <td>{alumno.nombre}</td>
+                            <td>
+                              {alumno.nombre}
+                              {/* Apuntado, pero sin cuenta todavía: está
+                                  esperando a que secretaría mande la
+                                  invitación. */}
+                              {!alumno.authId && (
+                                <span className="pill pill-suave">
+                                  invitación pendiente
+                                </span>
+                              )}
+                            </td>
                             <td>
                               <a href={`mailto:${alumno.email}`}>{alumno.email}</a>
                             </td>
                             <td className="nowrap">{alumno.telefono}</td>
+                            {matricular && (
+                              <td>
+                                <BotonQuitar
+                                  grupoId={grupo.id}
+                                  usuarioId={alumno.id}
+                                  nombre={alumno.nombre}
+                                  nombreGrupo={grupo.nombre}
+                                />
+                              </td>
+                            )}
                           </tr>
                         ))}
                       </tbody>
@@ -134,9 +158,28 @@ export default async function GrupoDelPanel({ params }: Props) {
                   <p className="small" style={{ marginTop: 16 }}>
                     Son datos de contacto de socios: úsalos para avisar de los
                     ensayos y de las actuaciones, y para nada más.
+                    {matricular &&
+                      " Quitar a alguien lo saca solo de este grupo: sigue en el centro y en sus otros grupos."}
                   </p>
                 </>
               )}
+            </section>
+          )}
+
+          {/* ---------- Añadir alumnos ---------- */}
+          {matricular && (
+            <section className="panel-bloque">
+              <h2 className="panel-h2">Apuntar a un alumno</h2>
+              <p className="small" style={{ margin: "0 0 26px" }}>
+                {usuario.rol === "admin"
+                  ? "Queda apuntado a este grupo y le llega al momento el correo para elegir su contraseña."
+                  : "Queda apuntado a este grupo al momento. El correo para que elija su contraseña lo manda secretaría, en cuanto lo apruebe: hasta entonces le verás como «invitación pendiente»."}
+              </p>
+
+              <FormularioAlumno
+                grupoId={grupo.id}
+                pideAprobacion={usuario.rol !== "admin"}
+              />
             </section>
           )}
 
@@ -144,11 +187,6 @@ export default async function GrupoDelPanel({ params }: Props) {
           {editar && (
             <section className="panel-bloque">
               <h2 className="panel-h2">Horarios y plazas</h2>
-              <p className="small" style={{ margin: "0 0 26px" }}>
-                Lo que cambies aquí se ve en la página de Actividades sin tocar
-                código. Los días y las horas de ensayo del Calendario van por
-                otro lado y todavía se editan en <code>src/data/grupos.ts</code>.
-              </p>
               <p className="small" style={{ margin: "0 0 26px" }}>
                 Mientras esto sea una maqueta, los cambios se guardan en la
                 memoria del servidor: se pierden al reiniciarlo.

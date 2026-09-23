@@ -2,15 +2,18 @@
 
 import { useActionState, useState } from "react";
 import {
+  anadirAlumno,
   darDeAlta,
   guardarFicha,
+  quitarAlumno,
   reenviarInvitacion,
 } from "@/app/panel/acciones";
 import { type Rol, roles, todosLosRoles } from "@/lib/roles";
 
 /**
- * Los formularios de la pantalla de usuarios: dar de alta a alguien, editar
- * su ficha y volver a mandarle la invitación.
+ * Los formularios para dar de alta a gente: el de secretaría en Usuarios (con
+ * rol y grupos), el de la ficha de cada persona, el botón de mandar la
+ * invitación y el de los profesores en la ficha de su grupo.
  */
 
 /** Un grupo, con lo justo para pintar su casilla. */
@@ -124,6 +127,7 @@ export function FormularioFicha({
     id: string;
     nombreDePila: string;
     apellidos: string;
+    email: string;
     telefono: string;
     rol: Rol;
     grupos: string[];
@@ -147,6 +151,11 @@ export function FormularioFicha({
         <div className="campo">
           <label htmlFor="ficha-apellidos">Apellidos</label>
           <input id="ficha-apellidos" name="apellidos" defaultValue={usuario.apellidos} />
+        </div>
+        <div className="campo">
+          <label htmlFor="ficha-email">Correo electrónico</label>
+          <input id="ficha-email" name="email" type="email" required defaultValue={usuario.email} />
+          <p className="ayuda">Es con lo que entra. Si lo cambias, entra con el nuevo desde ya.</p>
         </div>
         <div className="campo">
           <label htmlFor="ficha-telefono">Teléfono</label>
@@ -189,6 +198,98 @@ export function BotonReenviar({
 
       <button className="btn ghost sm" type="submit" disabled={enviando}>
         {enviando ? "Enviando…" : texto}
+      </button>
+    </form>
+  );
+}
+
+/**
+ * Apuntar a un alumno desde la ficha de un grupo. Sin rol ni grupos que elegir:
+ * es alumno, y va a este grupo.
+ */
+export function FormularioAlumno({
+  grupoId,
+  pideAprobacion,
+}: {
+  grupoId: string;
+  /** `true` si lo usa un profesor: la invitación la aprueba secretaría. */
+  pideAprobacion: boolean;
+}) {
+  const [estado, accion, enviando] = useActionState(anadirAlumno, {
+    mensaje: null,
+    error: null,
+    valores: null,
+  });
+  const antes = estado.valores;
+
+  return (
+    <form className="form form-ancho" action={accion}>
+      <input type="hidden" name="grupo" value={grupoId} />
+
+      <div className="campos-dos">
+        <div className="campo">
+          <label htmlFor="alumno-nombre">Nombre</label>
+          <input id="alumno-nombre" name="nombre" required autoComplete="off" defaultValue={antes?.nombre} />
+        </div>
+        <div className="campo">
+          <label htmlFor="alumno-apellidos">Apellidos</label>
+          <input id="alumno-apellidos" name="apellidos" autoComplete="off" defaultValue={antes?.apellidos} />
+        </div>
+        <div className="campo">
+          <label htmlFor="alumno-email">Correo electrónico</label>
+          <input id="alumno-email" name="email" type="email" required autoComplete="off" defaultValue={antes?.email} />
+          <p className="ayuda">
+            Si ya es alumno del centro, se le apunta a este grupo sin más.
+          </p>
+        </div>
+        <div className="campo">
+          <label htmlFor="alumno-telefono">Teléfono</label>
+          <input id="alumno-telefono" name="telefono" type="tel" autoComplete="off" defaultValue={antes?.telefono} />
+        </div>
+      </div>
+
+      {estado.error && <p className="form-error">{estado.error}</p>}
+      {estado.mensaje && <p className="form-ok">{estado.mensaje}</p>}
+
+      <button className="btn" type="submit" disabled={enviando}>
+        {enviando
+          ? "Apuntando…"
+          : pideAprobacion
+            ? "Apuntar y pedir la invitación"
+            : "Apuntar y mandar la invitación"}
+      </button>
+    </form>
+  );
+}
+
+/**
+ * Quitar a un alumno de un grupo. Pregunta antes, porque está en una lista
+ * donde es fácil pulsar la fila equivocada.
+ */
+export function BotonQuitar({
+  grupoId,
+  usuarioId,
+  nombre,
+  nombreGrupo,
+}: {
+  grupoId: string;
+  usuarioId: string;
+  nombre: string;
+  nombreGrupo: string;
+}) {
+  return (
+    <form
+      action={quitarAlumno}
+      onSubmit={(e) => {
+        if (!confirm(`¿Quitar a ${nombre} de ${nombreGrupo}? Seguirá en sus otros grupos.`)) {
+          e.preventDefault();
+        }
+      }}
+    >
+      <input type="hidden" name="grupo" value={grupoId} />
+      <input type="hidden" name="usuario" value={usuarioId} />
+      <button className="btn ghost sm" type="submit" aria-label={`Quitar a ${nombre} del grupo`}>
+        Quitar
       </button>
     </form>
   );

@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { cambiarRol } from "@/app/panel/acciones";
-import { FormularioAlta } from "@/components/FormulariosUsuario";
+import { cambiarRol, rechazarInvitacion } from "@/app/panel/acciones";
+import { BotonReenviar, FormularioAlta } from "@/components/FormulariosUsuario";
 import { PanelCabecera } from "@/components/PanelCabecera";
-import { exigirUsuario, todasLasCuentas, todosLosGrupos } from "@/lib/acceso";
+import {
+  exigirUsuario,
+  invitacionesPendientes,
+  todasLasCuentas,
+  todosLosGrupos,
+} from "@/lib/acceso";
 import {
   acciones,
   ambitoDe,
@@ -55,6 +60,7 @@ export default async function Usuarios() {
   }
 
   const cuentas = await todasLasCuentas();
+  const pendientes = await invitacionesPendientes();
   const grupos = await todosLosGrupos();
 
   const deAlta = cuentas.filter((cuenta) => cuenta.activo).length;
@@ -76,6 +82,76 @@ export default async function Usuarios() {
             entrar: cámbialo aquí y cambia al momento. Pulsa un nombre para
             editar sus datos y sus grupos.
           </p>
+
+          {/* ---------- Lo que han pedido los profesores ---------- */}
+          {pendientes.length > 0 && (
+            <section className="panel-bloque" id="pendientes">
+              <h2 className="panel-h2">
+                Invitaciones por aprobar{" "}
+                <span className="cuenta">{pendientes.length}</span>
+              </h2>
+              <p className="small" style={{ margin: 0 }}>
+                Alumnos que ha apuntado un profesor a su grupo. Ya están en el
+                grupo, pero no pueden entrar hasta que les mandes la invitación.
+                Si alguno no debería estar, recházalo y se borra su ficha.
+              </p>
+
+              <div className="tabla-scroll">
+                <table className="tabla">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Correo</th>
+                      <th>Grupo</th>
+                      <th>Lo pidió</th>
+                      <th />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendientes.map((persona) => (
+                      <tr key={persona.id}>
+                        <td>
+                          <Link href={`/panel/usuarios/${persona.id}`}>
+                            {persona.nombre}
+                          </Link>
+                        </td>
+                        <td>{persona.email}</td>
+                        <td>
+                          {persona.grupos
+                            .map((id) => nombreDeGrupo.get(id) ?? id)
+                            .join(", ") || <span className="apagado">ninguno</span>}
+                        </td>
+                        <td>
+                          {persona.pedidaPorNombre ?? "—"}
+                          <span className="apagado">
+                            {" · "}
+                            {new Date(persona.invitacionPedida!.en).toLocaleDateString(
+                              "es-ES",
+                              { day: "numeric", month: "short" },
+                            )}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="rol-form">
+                            <BotonReenviar
+                              usuarioId={persona.id}
+                              texto="Mandar invitación"
+                            />
+                            <form action={rechazarInvitacion}>
+                              <input type="hidden" name="usuario" value={persona.id} />
+                              <button className="btn ghost sm" type="submit">
+                                Rechazar
+                              </button>
+                            </form>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
 
           <section className="panel-bloque">
             <div className="tabla-scroll">

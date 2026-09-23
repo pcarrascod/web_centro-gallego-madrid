@@ -83,11 +83,17 @@ lectores de pantalla, así que no lo borres.
 
 Hay **tres tipos de usuario**, y el rol decide lo que cada uno ve al entrar.
 
-| | Zona privada | Ver alumnos | Editar grupos | Su ropa | Gestionar cuentas |
-| --- | --- | --- | --- | --- | --- |
-| **Administrador** | sí | todos | todos | — | sí |
-| **Profesor** | sí | sus grupos | sus grupos | — | — |
-| **Alumno** | sí | — | — | sí | — |
+| | Zona privada | Ver alumnos | Editar grupos | Apuntar y quitar alumnos | Su ropa | Gestionar cuentas |
+| --- | --- | --- | --- | --- | --- | --- |
+| **Administrador** | sí | todos | todos | todos | — | sí |
+| **Profesor** | sí | sus grupos | sus grupos | sus grupos* | — | — |
+| **Alumno** | sí | — | — | — | sí | — |
+
+* Un profesor apunta al alumno a su grupo, pero la invitación por correo no
+sale hasta que secretaría la aprueba en Usuarios → *Invitaciones por aprobar*.
+Así nadie recibe un correo del centro sin que secretaría lo sepa. Si el correo
+ya es de un alumno del centro, se le apunta al grupo sin más. Quitar a alguien
+de un grupo no le da de baja del centro: sigue en sus otros grupos.
 
 «Sus grupos» es la clave de todo: un profesor ve a los alumnos de los grupos que
 imparte, con su teléfono y su correo, y puede cambiar sus horarios — pero de los
@@ -155,6 +161,9 @@ Si añades un grupo nuevo a `grupos.ts`, vuelve a ejecutar `npm run
 preparar-base` (sin `--admin`) para que se pueda matricular a gente en él.
 
 ### Dar de alta a alguien
+
+Hay dos caminos: secretaría desde **Usuarios**, o un profesor desde la ficha de
+su grupo (*Apuntar a un alumno*), que deja la invitación pendiente de aprobar.
 
 En **Usuarios**, abajo del todo, rellena nombre, correo, rol y grupos. A esa
 persona le llega un correo con un enlace; lo abre, elige su contraseña y entra.

@@ -64,11 +64,17 @@ export type Usuario = {
   activo: boolean;
   /** El id de su cuenta de acceso, o `null` si todavía no tiene. */
   authId: string | null;
+  /**
+   * Si fue un profesor quien la apuntó y pidió la invitación: el id de ese
+   * profesor y cuándo. Mientras no tenga `authId`, está pendiente de aprobar.
+   */
+  invitacionPedida: { por: string | null; en: string } | null;
 };
 
 /** Lo que se pide de la base de datos, con las matrículas ya colgando. */
 const COLUMNAS =
   "id, auth_id, nombre, apellidos, email, telefono, rol, activo, " +
+  "invitacion_pedida_por, invitacion_pedida_en, " +
   "matriculas(grupo_id, temporada, fecha_baja)";
 
 type Fila = {
@@ -80,6 +86,8 @@ type Fila = {
   telefono: string | null;
   rol: Rol;
   activo: boolean;
+  invitacion_pedida_por: string | null;
+  invitacion_pedida_en: string | null;
   matriculas: {
     grupo_id: string;
     temporada: string;
@@ -102,6 +110,9 @@ function aUsuario(fila: Fila): Usuario {
       .map((m) => m.grupo_id),
     activo: fila.activo,
     authId: fila.auth_id,
+    invitacionPedida: fila.invitacion_pedida_en
+      ? { por: fila.invitacion_pedida_por, en: fila.invitacion_pedida_en }
+      : null,
   };
 }
 
@@ -148,6 +159,19 @@ export async function usuarioPorAuthId(
   return data ? aUsuario(data as unknown as Fila) : undefined;
 }
 
+/** La ficha que tiene ese correo, si hay alguna. */
+export async function usuarioPorEmail(
+  email: string,
+): Promise<Usuario | undefined> {
+  const { data, error } = await clienteAdmin()
+    .from("usuarios")
+    .select(COLUMNAS)
+    .eq("email", email.trim().toLowerCase())
+    .maybeSingle();
+  comprobar(error, "buscar por correo");
+  return data ? aUsuario(data as unknown as Fila) : undefined;
+}
+
 /** Lo que se rellena al dar de alta a alguien. */
 export type DatosNuevos = {
   nombre: string;
@@ -163,6 +187,8 @@ export type DatosNuevos = {
  */
 export async function crearFicha(
   datos: DatosNuevos,
+  /** Si la crea un profesor: su id. La invitación queda pendiente de aprobar. */
+  pedidaPor?: string,
 ): Promise<{ id: string } | { error: string }> {
   const { data, error } = await clienteAdmin()
     .from("usuarios")
@@ -172,6 +198,12 @@ export async function crearFicha(
       email: datos.email.toLowerCase(),
       telefono: datos.telefono || null,
       rol: datos.rol,
+      ...(pedidaPor
+        ? {
+            invitacion_pedida_por: pedidaPor,
+            invitacion_pedida_en: new Date().toISOString(),
+          }
+        : {}),
     })
     .select("id")
     .single();
@@ -206,6 +238,20 @@ export async function guardarDatos(
     })
     .eq("id", id);
   comprobar(error, "guardar datos");
+}
+
+/**
+ * Cambiar el correo de la ficha. Devuelve `false` si ya lo tiene otra
+ * persona. (El de la cuenta de acceso se cambia aparte, en `sesion.ts`.)
+ */
+export async function guardarCorreo(id: string, email: string): Promise<boolean> {
+  const { error } = await clienteAdmin()
+    .from("usuarios")
+    .update({ email: email.trim().toLowerCase() })
+    .eq("id", id);
+  if (error?.code === "23505") return false;
+  comprobar(error, "guardar correo");
+  return true;
 }
 
 export async function guardarRol(id: string, rol: Rol): Promise<void> {
@@ -267,6 +313,56 @@ export async function guardarGrupos(
     { onConflict: "usuario_id,grupo_id,temporada" },
   );
   comprobar(errorPoner, "guardar matrículas");
+}
+
+/**
+ * Apuntar a alguien a un grupo más esta temporada, sin tocar los que ya
+ * tenía. Si ya estuvo y se le quitó, vuelve.
+ */
+export async function anadirAGrupo(
+  id: string,
+  grupoId: string,
+  papel: "profesor" | "alumno",
+): Promise<void> {
+  const { error } = await clienteAdmin().from("matriculas").upsert(
+    { usuario_id: id, grupo_id: grupoId, temporada: TEMPORADA, papel, fecha_baja: null },
+    { onConflict: "usuario_id,grupo_id,temporada" },
+  );
+  comprobar(error, "apuntar al grupo");
+}
+
+/**
+ * Sacar a alguien de un grupo esta temporada. No se borra la matrícula: se le
+ * pone fecha de baja, para que quede el histórico. Sus otros grupos no se
+ * tocan.
+ */
+export async function quitarDeGrupo(id: string, grupoId: string): Promise<void> {
+  const { error } = await clienteAdmin()
+    .from("matriculas")
+    .update({ fecha_baja: new Date().toISOString().slice(0, 10) })
+    .eq("usuario_id", id)
+    .eq("grupo_id", grupoId)
+    .eq("temporada", TEMPORADA)
+    .is("fecha_baja", null);
+  comprobar(error, "quitar del grupo");
+}
+
+/**
+ * Borrar del todo una ficha. Solo se puede con quien nunca llegó a tener
+ * cuenta: es para las invitaciones que secretaría rechaza, que no tienen
+ * historial que conservar. Para todo lo demás está la baja.
+ *
+ * Devuelve `false` si no se ha borrado porque la persona ya tiene cuenta.
+ */
+export async function borrarFichaSinCuenta(id: string): Promise<boolean> {
+  const { data, error } = await clienteAdmin()
+    .from("usuarios")
+    .delete()
+    .eq("id", id)
+    .is("auth_id", null)
+    .select("id");
+  comprobar(error, "borrar ficha");
+  return (data ?? []).length > 0;
 }
 
 /** Dar de baja (o volver a dar de alta) sin borrar nada. */

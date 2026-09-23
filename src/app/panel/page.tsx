@@ -5,7 +5,12 @@ import { PanelCabecera } from "@/components/PanelCabecera";
 import { ProximosEventos } from "@/components/ProximosEventos";
 import { TarjetaGrupoPanel } from "@/components/TarjetaGrupoPanel";
 import { aISO, eventosParaGrupos } from "@/data/eventos";
-import { exigirUsuario, miRopa, misGrupos } from "@/lib/acceso";
+import {
+  exigirUsuario,
+  invitacionesPendientes,
+  miRopa,
+  misGrupos,
+} from "@/lib/acceso";
 import { primerNombre } from "@/lib/nombres";
 import { type Rol, puede, roles } from "@/lib/roles";
 
@@ -40,6 +45,11 @@ export default async function Panel() {
   const tieneRopa = puede(usuario.rol, "editar:mi-ropa");
   const ropa = tieneRopa ? await miRopa() : null;
 
+  /* Lo que han pedido los profesores y espera a secretaría. */
+  const pendientes = puede(usuario.rol, "gestionar:usuarios")
+    ? (await invitacionesPendientes()).length
+    : 0;
+
   const hoyISO = aISO(new Date());
 
   /*
@@ -69,6 +79,17 @@ export default async function Panel() {
           <p className="lead" style={{ margin: "16px 0 52px" }}>
             {roles[usuario.rol].resumen}
           </p>
+
+          {pendientes > 0 && (
+            <p className="form-ok" style={{ marginBottom: 52 }}>
+              {pendientes === 1
+                ? "Hay 1 invitación esperando a que la apruebes."
+                : `Hay ${pendientes} invitaciones esperando a que las apruebes.`}{" "}
+              <Link className="link" href="/panel/usuarios#pendientes">
+                Revisarlas
+              </Link>
+            </p>
+          )}
 
           {/* ---------- Eventos ---------- */}
           {/* Va primero a propósito: es lo que caduca. Los grupos y la ropa

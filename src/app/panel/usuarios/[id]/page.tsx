@@ -74,8 +74,7 @@ export default async function FichaDeUsuario({
           <section className="panel-bloque">
             <h2 className="panel-h2">Datos y grupos</h2>
             <p className="small" style={{ margin: "0 0 26px" }}>
-              Correo: <strong>{persona.email || "sin correo"}</strong>. Es con lo
-              que entra, así que no se cambia desde aquí. El rol se cambia en la{" "}
+              El rol se cambia en la{" "}
               <Link className="link" href="/panel/usuarios">
                 lista de usuarios
               </Link>
@@ -86,6 +85,7 @@ export default async function FichaDeUsuario({
                 id: persona.id,
                 nombreDePila: persona.nombreDePila,
                 apellidos: persona.apellidos,
+                email: persona.email,
                 telefono: persona.telefono,
                 rol: persona.rol,
                 grupos: persona.grupos,
@@ -97,7 +97,9 @@ export default async function FichaDeUsuario({
           <section className="panel-bloque">
             <h2 className="panel-h2">{cuenta.titulo}</h2>
             <p className="small" style={{ margin: "0 0 20px" }}>
-              {cuenta.texto}
+              {persona.cuenta === "sin-cuenta" && persona.invitacionPedida
+                ? "La ha apuntado un profesor a su grupo y la invitación espera a que la apruebes. Mándala desde aquí o desde la lista de Usuarios."
+                : cuenta.texto}
             </p>
             {persona.email && (
               <BotonReenviar

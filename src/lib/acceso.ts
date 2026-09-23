@@ -186,6 +186,31 @@ export async function fichaDeUsuario(id: string): Promise<
   return { ...usuario, cuenta: cuenta ?? "sin-cuenta" };
 }
 
+/** Una invitación que ha pedido un profesor, con su nombre para enseñarlo. */
+export type InvitacionPendiente = Usuario & { pedidaPorNombre: string | null };
+
+/**
+ * Las invitaciones que han pedido los profesores y secretaría todavía no ha
+ * mandado ni rechazado, de la más antigua a la más nueva. Solo para quien
+ * gestiona las cuentas.
+ */
+export async function invitacionesPendientes(): Promise<InvitacionPendiente[]> {
+  await exigirPermiso("gestionar:usuarios");
+
+  const todos = await usuariosAhora();
+  const nombres = new Map(todos.map((usuario) => [usuario.id, usuario.nombre]));
+
+  return todos
+    .filter((usuario) => usuario.activo && !usuario.authId && usuario.invitacionPedida)
+    .map((usuario) => ({
+      ...usuario,
+      pedidaPorNombre: nombres.get(usuario.invitacionPedida?.por ?? "") ?? null,
+    }))
+    .sort((a, b) =>
+      (a.invitacionPedida?.en ?? "").localeCompare(b.invitacionPedida?.en ?? ""),
+    );
+}
+
 /**
  * La ficha de ropa de quien esté mirando.
  *

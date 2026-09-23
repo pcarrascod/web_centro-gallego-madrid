@@ -118,6 +118,12 @@ create table if not exists usuarios (
   -- son datos personales como cualquier otro.
   notas text,
 
+  -- Cuando es un profesor quien apunta a un alumno nuevo, la invitación no
+  -- sale sola: la aprueba secretaría. Aquí queda quién la pidió y cuándo.
+  -- Pendiente de aprobar = tiene `invitacion_pedida_en` y no tiene `auth_id`.
+  invitacion_pedida_por uuid references usuarios(id) on delete set null,
+  invitacion_pedida_en timestamptz,
+
   creado_en timestamptz not null default now(),
   actualizado_en timestamptz not null default now(),
 
@@ -139,6 +145,11 @@ create unique index if not exists usuarios_email_unico
 -- que más va a crecer con los años. Con índice da igual que haya doscientos
 -- alumnos o veinte mil.
 create index if not exists usuarios_activos on usuarios (activo, rol);
+
+-- «¿Qué invitaciones hay por aprobar?», cada vez que se abre Usuarios.
+create index if not exists usuarios_invitaciones_pendientes
+  on usuarios (invitacion_pedida_en)
+  where auth_id is null and invitacion_pedida_en is not null;
 
 
 -- ---------------------------------------------------------------------------

@@ -94,9 +94,9 @@ export const grupos: Grupo[] = [
   {
     id: "canto-pandereta",
     categoria: "pand",
-    nombre: "Panderereteiras",
+    nombre: "Pandereteiras",
     nombreCorto: "Pandereta",
-    quien: "Adultos · Salón o Sala Airiños",
+    quien: "Adultos · Salón grande",
     dia: "Lunes",
     diaSemana: 1,
     horaEnsayo: "18.00",

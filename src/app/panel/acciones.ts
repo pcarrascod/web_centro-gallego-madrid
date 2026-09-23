@@ -14,20 +14,27 @@ import {
   exigirPermiso,
   exigirPermisoEnGrupo,
   fichaDeUsuario,
+  grupo as buscarGrupo,
   todosLosGrupos,
 } from "@/lib/acceso";
 import {
+  anadirAGrupo,
+  borrarFichaSinCuenta,
   crearFicha,
   enlazarCuenta,
   guardarActivo,
+  guardarCorreo,
   guardarDatos,
   guardarGrupo as apuntarGrupo,
   guardarGrupos,
   guardarRol,
   guardarRopaPropia,
+  quitarDeGrupo,
+  usuarioPorEmail,
+  usuarioPorId,
 } from "@/lib/almacen";
 import { type Rol, esRol } from "@/lib/roles";
-import { invitar } from "@/lib/sesion";
+import { cambiarCorreoDeCuenta, invitar } from "@/lib/sesion";
 
 /**
  * Lo que se puede guardar desde el panel.
@@ -285,7 +292,14 @@ export async function darDeAlta(
   redirect(`/panel/usuarios/${ficha.id}`);
 }
 
-/** Guardar los datos de contacto y los grupos desde la ficha. */
+/**
+ * Guardar los datos de contacto, el correo y los grupos desde la ficha.
+ *
+ * El correo es con lo que la persona entra, así que si ya tiene cuenta se
+ * cambia en los dos sitios: en su ficha y en su cuenta de acceso. Primero en
+ * la cuenta, porque es lo que puede fallar (otra cuenta con ese correo); si
+ * fallara después de cambiar la ficha, quedarían las dos cosas desparejadas.
+ */
 export async function guardarFicha(
   _anterior: EstadoGuardado,
   datos: FormData,
@@ -302,6 +316,26 @@ export async function guardarFicha(
   const nombre = String(datos.get("nombre") ?? "").trim();
   if (!nombre) return { mensaje: null, error: "Falta el nombre." };
 
+  const email = String(datos.get("email") ?? "").trim().toLowerCase();
+  if (!PARECE_CORREO.test(email)) {
+    return { mensaje: null, error: "Ese correo no parece un correo." };
+  }
+
+  const cambiaCorreo = email !== ficha.email;
+  if (cambiaCorreo) {
+    const otra = await usuarioPorEmail(email);
+    if (otra && otra.id !== ficha.id) {
+      return { mensaje: null, error: `Ese correo ya es de ${otra.nombre}.` };
+    }
+    if (ficha.authId) {
+      const error = await cambiarCorreoDeCuenta(ficha.authId, email);
+      if (error) return { mensaje: null, error };
+    }
+    if (!(await guardarCorreo(ficha.id, email))) {
+      return { mensaje: null, error: "Ya hay otra persona con ese correo." };
+    }
+  }
+
   await guardarDatos(ficha.id, {
     nombre,
     apellidos: String(datos.get("apellidos") ?? "").trim(),
@@ -310,7 +344,22 @@ export async function guardarFicha(
   await matricular(ficha.id, ficha.rol, await gruposMarcados(datos));
 
   refresh();
-  return { mensaje: "Guardado.", error: null };
+
+  /* Si todavía no había abierto la invitación, la que tiene en el correo
+     antiguo ya no le sirve de mucho. */
+  if (cambiaCorreo && ficha.cuenta !== "activa") {
+    return {
+      mensaje:
+        "Guardado. Como aún no había activado la cuenta, mándale la invitación otra vez: la anterior fue al correo antiguo.",
+      error: null,
+    };
+  }
+  return {
+    mensaje: cambiaCorreo
+      ? `Guardado. A partir de ahora entra con ${email}.`
+      : "Guardado.",
+    error: null,
+  };
 }
 
 /** Volver a mandar el correo de invitación a quien no ha llegado a entrar. */
@@ -357,5 +406,152 @@ export async function cambiarAlta(datos: FormData): Promise<void> {
   }
 
   await guardarActivo(usuarioId, activo);
+  refresh();
+}
+
+/* ---------- Alumnos que apunta un profesor ---------- */
+
+/** Como `EstadoAlta`, pero con mensaje de «hecho» y sin grupos que elegir. */
+export type EstadoAlumno = {
+  mensaje: string | null;
+  error: string | null;
+  valores: {
+    nombre: string;
+    apellidos: string;
+    email: string;
+    telefono: string;
+  } | null;
+};
+
+/**
+ * Apuntar a un alumno a un grupo desde la ficha del grupo.
+ *
+ * Lo pueden hacer el profesor del grupo y la administradora, con una
+ * diferencia: si lo hace un profesor, la invitación por correo no sale, queda
+ * pendiente hasta que secretaría la apruebe desde Usuarios. Si lo hace la
+ * administradora, sale ya.
+ *
+ * Si el correo es de un alumno que ya está en el centro, no se crea nada
+ * nuevo: se le apunta a este grupo y listo, porque ya tiene su cuenta.
+ */
+export async function anadirAlumno(
+  _anterior: EstadoAlumno,
+  datos: FormData,
+): Promise<EstadoAlumno> {
+  const grupoId = String(datos.get("grupo") ?? "");
+  const valores = {
+    nombre: String(datos.get("nombre") ?? "").trim(),
+    apellidos: String(datos.get("apellidos") ?? "").trim(),
+    email: String(datos.get("email") ?? "").trim(),
+    telefono: String(datos.get("telefono") ?? "").trim(),
+  };
+  const fallo = (error: string): EstadoAlumno => ({ mensaje: null, error, valores });
+  /* Al salir bien, el formulario se queda en blanco para apuntar al siguiente. */
+  const hecho = (mensaje: string): EstadoAlumno => {
+    refresh();
+    return { mensaje, error: null, valores: null };
+  };
+
+  let yo;
+  try {
+    yo = await exigirPermisoEnGrupo("matricular:alumnos", grupoId);
+  } catch {
+    return fallo("No puedes apuntar alumnos a este grupo.");
+  }
+  if (!(await buscarGrupo(grupoId))) return fallo("Ese grupo no existe.");
+
+  const { nombre, apellidos, email, telefono } = valores;
+  if (!nombre) return fallo("Falta el nombre.");
+  if (!PARECE_CORREO.test(email)) return fallo("Ese correo no parece un correo.");
+
+  /* ¿Ya está en el centro? */
+  const existente = await usuarioPorEmail(email);
+  if (existente) {
+    if (existente.rol !== "alumno") {
+      return fallo("Ese correo es de un profesor o de secretaría, no de un alumno.");
+    }
+    if (!existente.activo) {
+      return fallo(
+        `${existente.nombre} está de baja en el centro. Pide a secretaría que la vuelva a dar de alta.`,
+      );
+    }
+    if (existente.grupos.includes(grupoId)) {
+      return fallo(`${existente.nombre} ya estaba en este grupo.`);
+    }
+    await anadirAGrupo(existente.id, grupoId, "alumno");
+    return hecho(
+      `${existente.nombre} ya tenía ficha en el centro: la hemos apuntado a este grupo.`,
+    );
+  }
+
+  /* Es nuevo. La administradora no tiene que pedirse permiso a sí misma. */
+  const esAdmin = yo.rol === "admin";
+  const ficha = await crearFicha(
+    { nombre, apellidos, email, telefono, rol: "alumno" },
+    esAdmin ? undefined : yo.id,
+  );
+  if ("error" in ficha) return fallo(ficha.error);
+
+  await anadirAGrupo(ficha.id, grupoId, "alumno");
+
+  if (!esAdmin) {
+    return hecho(
+      `${nombre} ya está en el grupo. Secretaría le mandará la invitación en cuanto la apruebe.`,
+    );
+  }
+
+  const invitacion = await invitar(email);
+  if ("error" in invitacion) {
+    return hecho(
+      `${nombre} ya está en el grupo, pero la invitación no ha salido: ${invitacion.error}`,
+    );
+  }
+  if (invitacion.authId) await enlazarCuenta(ficha.id, invitacion.authId);
+  return hecho(`${nombre} ya está en el grupo y le hemos mandado la invitación.`);
+}
+
+/**
+ * Rechazar una invitación que pidió un profesor. Como esa persona nunca llegó
+ * a tener cuenta, se borra su ficha entera, con su matrícula: no hay
+ * historial que guardar. Si ya tuviera cuenta, no se borra nada.
+ */
+export async function rechazarInvitacion(datos: FormData): Promise<void> {
+  await exigirPermiso("gestionar:usuarios");
+
+  const borrada = await borrarFichaSinCuenta(String(datos.get("usuario") ?? ""));
+  if (!borrada) {
+    throw new Error("Esa persona ya tiene cuenta: para quitarla, dala de baja.");
+  }
+  refresh();
+}
+
+/**
+ * Sacar a un alumno de un grupo, desde la lista de alumnos del grupo. Lo
+ * pueden hacer el profesor del grupo y la administradora.
+ *
+ * No le da de baja del centro: sigue en sus otros grupos y puede entrar igual.
+ * La única excepción es quien estaba esperando la invitación y se queda sin
+ * ningún grupo: esa solicitud ya no tiene sentido, y se borra para que no se
+ * quede colgando en la lista de secretaría.
+ */
+export async function quitarAlumno(datos: FormData): Promise<void> {
+  const grupoId = String(datos.get("grupo") ?? "");
+  await exigirPermisoEnGrupo("matricular:alumnos", grupoId);
+
+  /* Se comprueba que es un alumno de este grupo: si no, cualquiera con el
+     permiso en su grupo podría sacar a gente de grupos ajenos cambiando el id
+     del formulario, o sacar a un profesor de su propio grupo. */
+  const alumno = await usuarioPorId(String(datos.get("usuario") ?? ""));
+  if (!alumno || alumno.rol !== "alumno" || !alumno.grupos.includes(grupoId)) {
+    throw new Error("Esa persona no es alumna de este grupo.");
+  }
+
+  await quitarDeGrupo(alumno.id, grupoId);
+
+  const sinMasGrupos = alumno.grupos.length === 1;
+  if (sinMasGrupos && !alumno.authId && alumno.invitacionPedida) {
+    await borrarFichaSinCuenta(alumno.id);
+  }
+
   refresh();
 }

@@ -41,6 +41,7 @@ export type Accion =
   | "ver:panel"
   | "ver:alumnos"
   | "editar:grupo"
+  | "matricular:alumnos"
   | "editar:mi-ropa"
   | "gestionar:usuarios";
 
@@ -60,6 +61,11 @@ export const acciones: Record<Accion, { corta: string; larga: string }> = {
   "editar:grupo": {
     corta: "Editar grupos",
     larga: "Cambiar horarios, niveles, plazas y el aviso de estado",
+  },
+  "matricular:alumnos": {
+    corta: "Apuntar y quitar alumnos",
+    larga:
+      "Apuntar alumnos a un grupo y quitarlos de él. Si un profesor apunta a alguien nuevo, la invitación por correo la aprueba secretaría",
   },
   "editar:mi-ropa": {
     corta: "Su ropa",
@@ -92,10 +98,16 @@ export type Ambito = "todos" | "propios";
  * La tabla de permisos. Se lee como una cuadrícula:
  * si el rol no aparece con esa acción, no puede hacerla.
  *
- *                    ver:panel  ver:alumnos  editar:grupo  editar:mi-ropa  gestionar:usuarios
- *   Administrador      todos       todos        todos            —               todos
- *   Profesor           todos      propios      propios           —                 —
- *   Alumno             todos         —            —            todos               —
+ *                  ver:panel  ver:alumnos  editar:grupo  matricular:alumnos  editar:mi-ropa  gestionar:usuarios
+ *   Administrador    todos      todos        todos          todos                —              todos
+ *   Profesor         todos      propios      propios        propios              —                —
+ *   Alumno           todos        —            —              —                todos              —
+ *
+ * `matricular:alumnos` es apuntar a alguien a un grupo y quitarle. Quitar no le
+ * da de baja del centro: solo sale de ese grupo. Si un profesor apunta a
+ * alguien nuevo, se crea su ficha pero no se manda la invitación: queda
+ * pendiente para que la apruebe quien tenga `gestionar:usuarios`. Así nadie
+ * recibe un correo del centro sin que secretaría lo sepa.
  *
  * `editar:mi-ropa` solo lo tiene el alumno porque es por donde empezamos. Los
  * profesores también visten el traje: el día que haga falta, se les da añadiendo
@@ -106,12 +118,14 @@ export const permisos: Record<Rol, Partial<Record<Accion, Ambito>>> = {
     "ver:panel": "todos",
     "ver:alumnos": "todos",
     "editar:grupo": "todos",
+    "matricular:alumnos": "todos",
     "gestionar:usuarios": "todos",
   },
   profesor: {
     "ver:panel": "todos",
     "ver:alumnos": "propios",
     "editar:grupo": "propios",
+    "matricular:alumnos": "propios",
   },
   alumno: {
     "ver:panel": "todos",
